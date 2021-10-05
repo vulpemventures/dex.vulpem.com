@@ -1,5 +1,5 @@
 {
-  "name": "svelte-webpack-bulma",
+  "name": "dex.vulpem.com",
   "version": "1.0.0",
   "devDependencies": {
     "@tsconfig/svelte": "^1.0.10",
@@ -35,7 +35,8 @@
     "format": "npx prettier --write src/**/*.svelte"
   },
   "dependencies": {
-    "bulma": "^0.9.3"
+    "bulma": "^0.9.3",
+    "tdex-sdk": "^1.7.3"
   },
   "prettier": {
     "tabWidth": 2,

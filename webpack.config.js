@@ -34,7 +34,7 @@ module.exports = {
 					exclude: /node_modules/
 				},
 				{
-				test: /\.svelte$/,
+				test: /\.(html|svelte)$/,
 				use: {
 					loader: 'svelte-loader',
 					options: {
@@ -43,7 +43,7 @@ module.exports = {
 						},
 						emitCss: prod,
 						hotReload: !prod,
-							preprocess: sveltePreprocess({ sourceMap: !prod })
+						preprocess: sveltePreprocess({ sourceMap: !prod })
 					}
 				}
 			},
@@ -60,7 +60,11 @@ module.exports = {
 				resolve: {
 					fullySpecified: false
 				}
-			}
+			},
+			{
+				test: /\.(jpg|jpeg|png|svg)$/,
+				use: 'file-loader',
+			},
 		]
 	},
 	mode,

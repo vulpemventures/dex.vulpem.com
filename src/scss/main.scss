@@ -8,10 +8,11 @@
 
 // Update Bulma's global variables
 $family-sans-serif: "Poppins", sans-serif;
-$primary: #46b4a5;
+$primary: #ff4c31;
 
 // Update some of Bulma's component variables
 $control-border-width: 2px;
+$body-background-color: "black";
 
 // Import the rest of Bulma
 @import "node_modules/bulma/bulma";

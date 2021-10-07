@@ -1,17 +1,25 @@
 <script>
 	import Trade from './pages/Trade.svelte';
+  import Connect from './components/Connect.svelte'
 </script>
 
-<section class="section">
-  <div class="container is-max-desktop has-text-right">
-    <button class="button">Connect with Marina</button>
+
+<section class="hero has-background-grey-lighter is-fullheight">
+  <!-- Hero head: will stick at the top -->
+  <div class="hero-head">
+    <div class="container is-max-desktop has-text-right">
+      <Connect />
+    </div>
   </div>
-</section>
-<section class="section is-medium">
-  <div class="container is-max-desktop">
-		<Trade />
+
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <Trade />
+    </div>
   </div>
+
 </section>
+
 
 <style src="./scss/main.scss" lang="scss" global>
 </style>

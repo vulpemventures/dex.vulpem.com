@@ -1,18 +1,41 @@
 <script lang="ts">
   import CoinRow from '../components/CoinRow.svelte';
+  import TradeButton from '../components/TradeButton.svelte';
   import SelectCoin from '../components/SelectCoin.svelte';
-  import { Coin } from '../constants';
+  import {
+    Coin,
+    Direction,
+    TradeButtonStatus,
+    SupportedPairs,
+  } from '../constants';
 
-  const enum Direction {
-    SEND,
-    RECEIVE,
-  }
+  let sendCoin = Coin.Bitcoin;
+  let receiveCoin = Coin.Tether;
+
+  let sendAmount = undefined;
+  let receiveAmount = undefined;
 
   let showCoinModal = false;
   let activeInputDirection = Direction.RECEIVE;
 
-  let sendCoin = Coin.Bitcoin;
-  let receiveCoin = Coin.Tether;
+  const isValidAmount = (amt: string) => {
+    const numeric = Number(amt);
+    return !Number.isNaN(numeric) && numeric > 0;
+  };
+
+  const isValidPair = (a: Coin, b: Coin) => {
+    return (
+      SupportedPairs.some((pair: Coin[]) => {
+        return pair.includes(a) && pair.includes(b);
+      }) && a !== b
+    );
+  };
+
+  $: tradeButton = !isValidPair(sendCoin, receiveCoin)
+    ? TradeButtonStatus.InvalidPair
+    : isValidAmount(sendAmount) && isValidAmount(receiveAmount)
+    ? TradeButtonStatus.Trade
+    : TradeButtonStatus.EnterAmount;
 
   const showModal = (direction: Direction) => {
     activeInputDirection = direction;
@@ -22,14 +45,20 @@
   const onCoinSelected = (event: CustomEvent<{ coin: Coin }>) => {
     const { coin } = event.detail;
 
-    console.log(coin);
-
     if (activeInputDirection === Direction.SEND) {
       sendCoin = coin;
       return;
     }
 
     receiveCoin = coin;
+  };
+
+  const onSendAmountChange = () => {
+    console.log('send changing...');
+  };
+
+  const onReceiveAmountChange = () => {
+    console.log('receive changing...');
   };
 </script>
 
@@ -50,7 +79,13 @@
           </button>
         </div>
         <div class="control is-expanded">
-          <input class="input is-large" type="text" placeholder="0.00" />
+          <input
+            class="input is-large"
+            type="text"
+            placeholder="0.00"
+            bind:value={sendAmount}
+            on:input={onSendAmountChange}
+          />
         </div>
       </div>
 
@@ -66,11 +101,17 @@
           </button>
         </div>
         <div class="control is-expanded">
-          <input class="input is-large" type="text" placeholder="0.00" />
+          <input
+            class="input is-large"
+            type="text"
+            placeholder="0.00"
+            bind:value={receiveAmount}
+            on:input={onReceiveAmountChange}
+          />
         </div>
       </div>
 
-      <button type="button" class="button is-primary">Trade</button>
+      <TradeButton type={tradeButton} />
     </form>
   </div>
   {#if showCoinModal}

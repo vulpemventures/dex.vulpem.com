@@ -1,7 +1,14 @@
 export const enum Direction {
-    SEND,
-    RECEIVE
-  }
+  SEND,
+  RECEIVE
+}
+
+export const enum TradeButtonStatus {
+  Trade = "Trade",
+  EnterAmount = "Enter an amount",
+  SelectAsset = "Select an asset",
+  InvalidPair = "Pair not supported",
+}
 
 export enum Coin {
   Bitcoin = "Liquid Bitcoin",
@@ -14,3 +21,9 @@ export const CoinTicker: Record<string,string> = {
   [Coin.Tether]: "USDt",
   [Coin.LCAD]: "LCAD"
 }
+
+
+export const SupportedPairs = [
+  [Coin.Bitcoin, Coin.Tether],
+  [Coin.Bitcoin, Coin.LCAD],
+] 

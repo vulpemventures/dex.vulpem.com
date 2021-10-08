@@ -25,6 +25,6 @@
     </figure>
   </div>
   <div class="column is-two-third">
-    <span class="subtitle">{!showTicker ? name : ticker}</span>
+    <span class="subtitle has-text-white">{!showTicker ? name : ticker}</span>
   </div>
 </div>

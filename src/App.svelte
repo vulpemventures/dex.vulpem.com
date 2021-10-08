@@ -1,25 +1,26 @@
 <script>
-	import Trade from './pages/Trade.svelte';
-  import Connect from './components/Connect.svelte'
+  import Trade from './pages/Trade.svelte';
+  import Connect from './components/Connect.svelte';
 </script>
 
-
-<section class="hero has-background-grey-lighter is-fullheight">
+<section class="hero has-background-dark is-fullheight">
   <!-- Hero head: will stick at the top -->
   <div class="hero-head">
-    <div class="container is-max-desktop has-text-right">
+    <div class="container is-max-desktop has-text-right mt-3 mr-3">
       <Connect />
     </div>
   </div>
 
   <div class="hero-body">
     <div class="container is-max-desktop">
-      <Trade />
+      <div class="columns">
+        <div class="column is-half is-offset-one-quarter">
+          <Trade />
+        </div>
+      </div>
     </div>
   </div>
-
 </section>
-
 
 <style src="./scss/main.scss" lang="scss" global>
 </style>

@@ -15,21 +15,12 @@
     Coin,
     Direction,
     TradeButtonStatus,
-    SupportedPairs,
     CoinToAssetByChain,
   } from '../constants';
 
   import BrowserInjectIdentity from '../utils/browserInject';
-
-  const PROVIDER_ENDPOINT = 'https://provider.tdex.network:9945';
-  const client = new TraderClient(PROVIDER_ENDPOINT);
-
-  const market = {
-    baseAsset:
-      '6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d', // L-BTC
-    quoteAsset:
-      'ce091c998b83c78bb71a632313ba3760f1763d9cfcffae02258ffa9865a37bd2', // USDT
-  };
+  import { isValidAmount, isValidPair } from '../utils/checks';
+  import { getProviderByPair } from '../utils/tdex';
 
   let sendCoin = Coin.Bitcoin;
   let receiveCoin = Coin.Tether;
@@ -42,24 +33,13 @@
 
   let loading = false;
 
-  const isValidAmount = (amt: string) => {
-    const numeric = Number(amt);
-    return !Number.isNaN(numeric) && numeric > 0;
-  };
-
-  const isValidPair = (a: Coin, b: Coin) => {
-    return (
-      SupportedPairs.some((pair: Coin[]) => {
-        return pair.includes(a) && pair.includes(b);
-      }) && a !== b
-    );
-  };
-
   $: tradeButton = !isValidPair(sendCoin, receiveCoin)
     ? TradeButtonStatus.InvalidPair
     : isValidAmount(sendAmount) && isValidAmount(receiveAmount)
     ? TradeButtonStatus.Trade
     : TradeButtonStatus.EnterAmount;
+
+  let provider = getProviderByPair([sendCoin, receiveCoin]);
 
   const showModal = (direction: Direction) => {
     activeInputDirection = direction;
@@ -71,12 +51,16 @@
 
     if (activeInputDirection === Direction.SEND) {
       sendCoin = coin;
+      //update the provider
+      provider = getProviderByPair([sendCoin, receiveCoin]);
       // clean up
       sendAmount = undefined;
       return;
     }
 
     receiveCoin = coin;
+    //update the provider
+    provider = getProviderByPair([sendCoin, receiveCoin]);
     // clean up
     receiveAmount = undefined;
   };
@@ -95,14 +79,15 @@
     loading = true;
 
     const assetHash = CoinToAssetByChain['liquid'][sendCoin].hash;
-    const isBaseComingIn = assetHash === market.baseAsset;
+    const isBaseComingIn = assetHash === provider.market.baseAsset;
     const tradeType = isBaseComingIn ? TradeType.SELL : TradeType.BUY;
 
     const amountInSatoshis = sendAmount * Math.pow(10, 8);
 
     try {
+      const client = new TraderClient(provider.endpoint);
       const [firstPrice] = await client.marketPrice(
-        market,
+        provider.market,
         tradeType,
         amountInSatoshis,
         assetHash
@@ -126,14 +111,15 @@
     loading = true;
 
     const assetHash = CoinToAssetByChain['liquid'][receiveCoin].hash;
-    const isBaseComingIn = assetHash === market.baseAsset;
+    const isBaseComingIn = assetHash === provider.market.baseAsset;
     const tradeType = isBaseComingIn ? TradeType.SELL : TradeType.BUY;
 
     const amountInSatoshis = receiveAmount * Math.pow(10, 8);
 
     try {
+      const client = new TraderClient(provider.endpoint);
       const [firstPrice] = await client.marketPrice(
-        market,
+        provider.market,
         tradeType,
         amountInSatoshis,
         assetHash
@@ -163,14 +149,10 @@
       // THIS not, I got TypeError: Cannot read properties of undefined (reading 'script')
       const utxos = await window.marina.getCoins();
 
-      // THIS WORKS
-      //const addrs = await (window as any).marina.getAddresses();
-      //const utxos = await fetchAndUnblindUtxos(addrs, 'https://blockstream.info/liquid/api');
-
       console.log(utxos);
 
       const trade = new Trade({
-        providerUrl: PROVIDER_ENDPOINT,
+        providerUrl: provider.endpoint,
         explorerUrl: 'https://blockstream.info/liquid/api',
         coinSelector: greedyCoinSelector(),
         utxos: utxos.filter((u) => (u as UtxoInterface).prevout),
@@ -179,21 +161,21 @@
       const { hash } = CoinToAssetByChain['liquid'][sendCoin];
       const amountToBeSentInSatoshis = sendAmount * Math.pow(10, 8);
 
-      const isBuy = hash === market.quoteAsset;
+      const isBuy = hash === provider.market.quoteAsset;
 
-      console.log(isBuy, amountToBeSentInSatoshis, hash, market);
+      console.log(isBuy, amountToBeSentInSatoshis, hash, provider.market);
 
       let txid;
       if (isBuy) {
         txid = await trade.buy({
-          market: market,
+          market: provider.market,
           amount: amountToBeSentInSatoshis,
           asset: hash,
           identity,
         });
       } else {
         txid = await trade.sell({
-          market: market,
+          market: provider.market,
           amount: amountToBeSentInSatoshis,
           asset: hash,
           identity,

@@ -23,17 +23,35 @@ export const CoinTicker: Record<string,string> = {
 };
 
 
+const LIQUID_BTC = '6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d';
+const LIQUID_USDT = 'ce091c998b83c78bb71a632313ba3760f1763d9cfcffae02258ffa9865a37bd2';
+const LIQUID_CAD = '0e99c1a6da379d1f4151fb9df90449d40d0608f6cb33a5bcbfc8c265f42bab0a';
+
 export const SupportedPairs = [
   [Coin.Bitcoin, Coin.Tether],
   [Coin.Bitcoin, Coin.LCAD],
 ];
 
+export const SupportedProviders: Record<string,{ market: { baseAsset: string, quoteAsset: string}, endpoint: string}> = {
+  [Coin.LCAD]: {
+    market: {
+      baseAsset: LIQUID_BTC,
+      quoteAsset: LIQUID_CAD
+    },
+    endpoint: "http://d7y3mzol3eo2tneqw5oytj23knm3734npwml4jzazrzzpy32e56lrxqd.onion:80",
+  },
+  [Coin.Tether]: {
+    market: {
+      baseAsset: LIQUID_BTC,
+      quoteAsset: LIQUID_USDT
+    },
+    endpoint: "http://btuiucyiumvdzhlnhqbnj6k5yrbwo2dlznzosicwnf6nw5aewr77elyd.onion:80"
+  }
+}
 
 
 
-const LIQUID_BTC = '6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d';
-const LIQUID_USDT = 'ce091c998b83c78bb71a632313ba3760f1763d9cfcffae02258ffa9865a37bd2';
-const LIQUID_CAD = '0e99c1a6da379d1f4151fb9df90449d40d0608f6cb33a5bcbfc8c265f42bab0a';
+
 // testnet
 const LIQUID_BTC_TESTNET = '144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49';
 // regtest

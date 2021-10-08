@@ -84,7 +84,7 @@
   const onSwap = () => {
     [sendCoin, receiveCoin] = [receiveCoin, sendCoin];
     [sendAmount, receiveAmount] = [receiveAmount, sendAmount];
-  }
+  };
 
   const onSendAmountChange = async () => {
     console.log('send changing...');
@@ -173,7 +173,7 @@
         providerUrl: PROVIDER_ENDPOINT,
         explorerUrl: 'https://blockstream.info/liquid/api',
         coinSelector: greedyCoinSelector(),
-        utxos: utxos.filter(u => (u as UtxoInterface).prevout),
+        utxos: utxos.filter((u) => (u as UtxoInterface).prevout),
       });
 
       const { hash } = CoinToAssetByChain['liquid'][sendCoin];
@@ -235,10 +235,8 @@
   </div>
   <div class="field mt-3">
     <div class="control has-text-centered">
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <a on:click={onSwap}>
-           ⬇️
-        </a> 
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <a on:click={onSwap}> ⬇️ </a>
     </div>
   </div>
   <!-- TO -->

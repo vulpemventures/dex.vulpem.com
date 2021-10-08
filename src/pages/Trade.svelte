@@ -6,7 +6,6 @@
     TradeType,
     TraderClient,
     UtxoInterface,
-    fetchAndUnblindUtxos,
   } from 'tdex-sdk';
 
   import CoinRow from '../components/CoinRow.svelte';
@@ -22,8 +21,7 @@
 
   import BrowserInjectIdentity from '../utils/browserInject';
 
-  const PROVIDER_ENDPOINT =
-    'http://btuiucyiumvdzhlnhqbnj6k5yrbwo2dlznzosicwnf6nw5aewr77elyd.onion:80';
+  const PROVIDER_ENDPOINT = 'https://provider.tdex.network:9945';
   const client = new TraderClient(PROVIDER_ENDPOINT);
 
   const market = {
@@ -36,8 +34,8 @@
   let sendCoin = Coin.Bitcoin;
   let receiveCoin = Coin.Tether;
 
-  $: sendAmount = undefined;
-  $: receiveAmount = undefined;
+  let sendAmount = undefined;
+  let receiveAmount = undefined;
 
   let showCoinModal = false;
   let activeInputDirection = Direction.RECEIVE;
@@ -82,6 +80,11 @@
     // clean up
     receiveAmount = undefined;
   };
+
+  const onSwap = () => {
+    [sendCoin, receiveCoin] = [receiveCoin, sendCoin];
+    [sendAmount, receiveAmount] = [receiveAmount, sendAmount];
+  }
 
   const onSendAmountChange = async () => {
     console.log('send changing...');
@@ -170,7 +173,7 @@
         providerUrl: PROVIDER_ENDPOINT,
         explorerUrl: 'https://blockstream.info/liquid/api',
         coinSelector: greedyCoinSelector(),
-        utxos,
+        utxos: utxos.filter(u => (u as UtxoInterface).prevout),
       });
 
       const { hash } = CoinToAssetByChain['liquid'][sendCoin];
@@ -230,7 +233,14 @@
       />
     </div>
   </div>
-
+  <div class="field mt-3">
+    <div class="control has-text-centered">
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <a on:click={onSwap}>
+           ⬇️
+        </a> 
+    </div>
+  </div>
   <!-- TO -->
   <div class="field has-addons">
     <div class="control">
@@ -253,7 +263,11 @@
     </div>
   </div>
 
-  <TradeButton type={tradeButton} on:trade={onTradeSubmit} {loading} />
+  <div class="field mt-3">
+    <div class="control has-text-centered">
+      <TradeButton type={tradeButton} on:trade={onTradeSubmit} {loading} />
+    </div>
+  </div>
 </form>
 {#if showCoinModal}
   <SelectCoin bind:active={showCoinModal} on:selected={onCoinSelected} />
@@ -262,5 +276,12 @@
 <style>
   .coin-button {
     width: 140px;
+  }
+  .swap-button {
+    margin-top: -12px;
+    margin-bottom: -3px;
+    background-color: transparent;
+    border: none;
+    z-index: 999;
   }
 </style>

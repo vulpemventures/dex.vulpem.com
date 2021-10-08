@@ -275,11 +275,4 @@
   .coin-button {
     width: 140px;
   }
-  .swap-button {
-    margin-top: -12px;
-    margin-bottom: -3px;
-    background-color: transparent;
-    border: none;
-    z-index: 999;
-  }
 </style>

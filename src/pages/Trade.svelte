@@ -5,6 +5,8 @@
     greedyCoinSelector,
     TradeType,
     TraderClient,
+    UtxoInterface,
+    fetchAndUnblindUtxos
   } from 'tdex-sdk';
 
   import CoinRow from '../components/CoinRow.svelte';
@@ -18,19 +20,10 @@
     CoinToAssetByChain,
   } from '../constants';
 
-  /*   
+  import BrowserInjectIdentity from '../utils/browserInject';
 
-    import BrowserInjectIdentity from '../utils/browserInject';
-
-  const identity = new BrowserInjectIdentity({
-    chain:'liquid',
-    type: IdentityType.Inject,
-    opts: {
-      windowProvider: 'marina',
-    },
-  }); */
-
-  const client = new TraderClient('https://provider.tdex.network:9945');
+  const PROVIDER_ENDPOINT = 'https://provider.tdex.network:9945';
+  const client = new TraderClient(PROVIDER_ENDPOINT);
 
   const market = {
     baseAsset:
@@ -47,6 +40,8 @@
 
   let showCoinModal = false;
   let activeInputDirection = Direction.RECEIVE;
+
+  let loading = false;
 
   const isValidAmount = (amt: string) => {
     const numeric = Number(amt);
@@ -93,6 +88,8 @@
     if (!isValidAmount(sendAmount)) return;
     if (!isValidPair(sendCoin, receiveCoin)) return;
 
+    loading = true;
+
     const assetHash = CoinToAssetByChain['liquid'][sendCoin].hash;
     const isBaseComingIn = assetHash === market.baseAsset;
     const tradeType = isBaseComingIn ? TradeType.SELL : TradeType.BUY;
@@ -111,6 +108,8 @@
     } catch (err: unknown) {
       (tradeButton as any) = (err as Error).message;
       console.error(err);
+    } finally {
+      loading = false;
     }
   };
 
@@ -119,6 +118,8 @@
 
     if (!isValidAmount(receiveAmount)) return;
     if (!isValidPair(sendCoin, receiveCoin)) return;
+
+    loading = true;
 
     const assetHash = CoinToAssetByChain['liquid'][receiveCoin].hash;
     const isBaseComingIn = assetHash === market.baseAsset;
@@ -138,8 +139,76 @@
     } catch (err: unknown) {
       (tradeButton as any) = (err as Error).message;
       console.error(err);
+    } finally {
+      loading = false;
     }
   };
+
+  const onTradeSubmit = async () => {
+
+    const identity = new BrowserInjectIdentity({
+      chain:'liquid',
+      type: IdentityType.Inject,
+      opts: {
+        windowProvider: 'marina',
+      },
+    });
+
+    loading = true;
+
+
+    try {
+
+      // THIS not, I got TypeError: Cannot read properties of undefined (reading 'script')
+      const utxos = await window.marina.getCoins();
+
+      // THIS WORKS
+      //const addrs = await (window as any).marina.getAddresses();
+      //const utxos = await fetchAndUnblindUtxos(addrs, 'https://blockstream.info/liquid/api');
+
+      console.log(utxos)
+      
+      const trade = new Trade({
+        providerUrl: PROVIDER_ENDPOINT,
+        explorerUrl: 'https://blockstream.info/liquid/api',
+        coinSelector: greedyCoinSelector(),
+        utxos,
+      });
+
+      const { hash } = CoinToAssetByChain['liquid'][sendCoin];
+      const amountToBeSentInSatoshis = sendAmount * Math.pow(10, 8);
+
+      const isBuy = hash === market.quoteAsset;
+
+      console.log(isBuy, amountToBeSentInSatoshis, hash, market)
+
+      let txid;
+      if (isBuy) {
+        txid = await trade.buy({
+          market: market,
+          amount: amountToBeSentInSatoshis,
+          asset: hash,
+          identity,
+        });
+      } else {
+        txid = await trade.sell({
+          market: market,
+          amount: amountToBeSentInSatoshis,
+          asset: hash,
+          identity,
+        });
+      }
+
+      console.log(txid);
+    } catch(e) {
+      console.error(e);
+    } finally {
+      loading = false;
+    }
+
+
+  }
+  
 </script>
 
 <div class="columns">
@@ -191,7 +260,7 @@
         </div>
       </div>
 
-      <TradeButton type={tradeButton} />
+      <TradeButton type={tradeButton} on:trade={onTradeSubmit} loading={loading} />
     </form>
   </div>
   {#if showCoinModal}

@@ -18,25 +18,25 @@
 </script>
 
 <div class="modal is-active">
-  <div class="modal-background" />
-  <div class="modal-content box">
+  <div class="modal-background" on:click={onCancel} />
+  <div class="modal-content box has-background-black">
     <div class="columns">
       <div class="column is-half is-offset-one-quarter">
-        <h1 class="title">Select an asset</h1>
-        <ul>
-          <li>
+        <h1 class="title has-text-white">Select an asset</h1>
+        <ul class="mt-6">
+          <li class="mt-3">
             <!-- svelte-ignore a11y-missing-attribute -->
             <a on:click={() => onSelect(Coin.Bitcoin)}>
               <CoinRow name={Coin.Bitcoin} />
             </a>
           </li>
-          <li>
+          <li class="mt-3">
             <!-- svelte-ignore a11y-missing-attribute -->
             <a on:click={() => onSelect(Coin.Tether)}>
               <CoinRow name={Coin.Tether} />
             </a>
           </li>
-          <li>
+          <li class="mt-3">
             <!-- svelte-ignore a11y-missing-attribute -->
             <a on:click={() => onSelect(Coin.LCAD)}>
               <CoinRow name={Coin.LCAD} />
@@ -46,5 +46,4 @@
       </div>
     </div>
   </div>
-  <button class="modal-close is-large" aria-label="close" on:click={onCancel} />
 </div>

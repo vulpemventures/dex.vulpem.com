@@ -55,13 +55,17 @@
 
 {#if !installed}
   <button
-    class="button"
+    class="button is-rounded is-primary"
     on:click={() => window.open('https://vulpem.com/marina')}
   >
     Install Marina
   </button>
 {:else if !enabled}
-  <button class="button" on:click={connect}> Connect with Marina </button>
+  <button class="button is-rounded is-primary" on:click={connect}>
+    Connect with Marina
+  </button>
 {:else}
-  <button class="button" on:click={connect}> Disconnect </button>
+  <button class="button is-rounded is-primary" on:click={connect}>
+    Disconnect
+  </button>
 {/if}

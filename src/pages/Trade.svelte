@@ -6,7 +6,6 @@
     TradeType,
     TraderClient,
     UtxoInterface,
-    fetchAndUnblindUtxos
   } from 'tdex-sdk';
 
   import CoinRow from '../components/CoinRow.svelte';
@@ -35,8 +34,8 @@
   let sendCoin = Coin.Bitcoin;
   let receiveCoin = Coin.Tether;
 
-  $: sendAmount = undefined;
-  $: receiveAmount = undefined;
+  let sendAmount = undefined;
+  let receiveAmount = undefined;
 
   let showCoinModal = false;
   let activeInputDirection = Direction.RECEIVE;
@@ -80,6 +79,11 @@
     receiveCoin = coin;
     // clean up
     receiveAmount = undefined;
+  };
+
+  const onSwap = () => {
+    [sendCoin, receiveCoin] = [receiveCoin, sendCoin];
+    [sendAmount, receiveAmount] = [receiveAmount, sendAmount];
   };
 
   const onSendAmountChange = async () => {
@@ -145,9 +149,8 @@
   };
 
   const onTradeSubmit = async () => {
-
     const identity = new BrowserInjectIdentity({
-      chain:'liquid',
+      chain: 'liquid',
       type: IdentityType.Inject,
       opts: {
         windowProvider: 'marina',
@@ -156,9 +159,7 @@
 
     loading = true;
 
-
     try {
-
       // THIS not, I got TypeError: Cannot read properties of undefined (reading 'script')
       const utxos = await window.marina.getCoins();
 
@@ -166,13 +167,13 @@
       //const addrs = await (window as any).marina.getAddresses();
       //const utxos = await fetchAndUnblindUtxos(addrs, 'https://blockstream.info/liquid/api');
 
-      console.log(utxos)
-      
+      console.log(utxos);
+
       const trade = new Trade({
         providerUrl: PROVIDER_ENDPOINT,
         explorerUrl: 'https://blockstream.info/liquid/api',
         coinSelector: greedyCoinSelector(),
-        utxos,
+        utxos: utxos.filter((u) => (u as UtxoInterface).prevout),
       });
 
       const { hash } = CoinToAssetByChain['liquid'][sendCoin];
@@ -180,7 +181,7 @@
 
       const isBuy = hash === market.quoteAsset;
 
-      console.log(isBuy, amountToBeSentInSatoshis, hash, market)
+      console.log(isBuy, amountToBeSentInSatoshis, hash, market);
 
       let txid;
       if (isBuy) {
@@ -200,73 +201,75 @@
       }
 
       console.log(txid);
-    } catch(e) {
+    } catch (e) {
       console.error(e);
     } finally {
       loading = false;
     }
-
-
-  }
-  
+  };
 </script>
 
-<div class="columns">
-  <div class="column is-half is-offset-one-quarter">
-    <form class="box">
-      <h1 class="title">Trade</h1>
+<form class="box has-background-black">
+  <h1 class="title has-text-white">Trade</h1>
 
-      <!-- FROM -->
-      <div class="field has-addons">
-        <div class="control">
-          <button
-            type="button"
-            class="button is-large is-white coin-button"
-            on:click={() => showModal(Direction.SEND)}
-          >
-            <CoinRow name={sendCoin} showTicker />
-          </button>
-        </div>
-        <div class="control is-expanded">
-          <input
-            class="input is-large"
-            type="text"
-            placeholder="0.00"
-            bind:value={sendAmount}
-            on:input={onSendAmountChange}
-          />
-        </div>
-      </div>
-
-      <!-- TO -->
-      <div class="field has-addons">
-        <div class="control">
-          <button
-            type="button"
-            class="button is-large is-white coin-button"
-            on:click={() => showModal(Direction.RECEIVE)}
-          >
-            <CoinRow name={receiveCoin} showTicker />
-          </button>
-        </div>
-        <div class="control is-expanded">
-          <input
-            class="input is-large"
-            type="text"
-            placeholder="0.00"
-            bind:value={receiveAmount}
-            on:input={onReceiveAmountChange}
-          />
-        </div>
-      </div>
-
-      <TradeButton type={tradeButton} on:trade={onTradeSubmit} loading={loading} />
-    </form>
+  <!-- FROM -->
+  <div class="field has-addons">
+    <div class="control">
+      <button
+        type="button"
+        class="button is-large is-white coin-button has-background-dark"
+        on:click={() => showModal(Direction.SEND)}
+      >
+        <CoinRow name={sendCoin} showTicker />
+      </button>
+    </div>
+    <div class="control is-expanded">
+      <input
+        class="input is-large has-background-dark has-text-white has-text-right"
+        type="text"
+        placeholder="0.00"
+        bind:value={sendAmount}
+        on:input={onSendAmountChange}
+      />
+    </div>
   </div>
-  {#if showCoinModal}
-    <SelectCoin bind:active={showCoinModal} on:selected={onCoinSelected} />
-  {/if}
-</div>
+  <div class="field mt-3">
+    <div class="control has-text-centered">
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <a on:click={onSwap}> ⬇️ </a>
+    </div>
+  </div>
+  <!-- TO -->
+  <div class="field has-addons">
+    <div class="control">
+      <button
+        type="button"
+        class="button is-large is-white coin-button has-background-dark"
+        on:click={() => showModal(Direction.RECEIVE)}
+      >
+        <CoinRow name={receiveCoin} showTicker />
+      </button>
+    </div>
+    <div class="control is-expanded">
+      <input
+        class="input is-large has-background-dark has-text-white has-text-right"
+        type="text"
+        placeholder="0.00"
+        bind:value={receiveAmount}
+        on:input={onReceiveAmountChange}
+      />
+    </div>
+  </div>
+
+  <div class="field mt-3">
+    <div class="control has-text-centered">
+      <TradeButton type={tradeButton} on:trade={onTradeSubmit} {loading} />
+    </div>
+  </div>
+</form>
+{#if showCoinModal}
+  <SelectCoin bind:active={showCoinModal} on:selected={onCoinSelected} />
+{/if}
 
 <style>
   .coin-button {

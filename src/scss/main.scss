@@ -12,7 +12,14 @@ $primary: #ff4c31;
 
 // Update some of Bulma's component variables
 $control-border-width: 2px;
-$body-background-color: "black";
+$input-border-color: $grey-darker;
+$input-hover-border-color: $grey-darker;
+$input-placeholder-color: $grey;
+$input-focus-border-color: "none";
+$input-focus-color: "none";
+$input-focus-box-shadow-size: 0px;
+$input-focus-box-shadow-color: "none";
+$modal-background-background-color: "transparent";
 
 // Import the rest of Bulma
 @import "node_modules/bulma/bulma";

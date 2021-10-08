@@ -5,8 +5,8 @@
   const dispatch = createEventDispatcher();
 
   const onClick = () => {
-		dispatch('trade');
-	}
+    dispatch('trade');
+  };
 
   export let type: string;
   export let loading: boolean;
@@ -20,10 +20,10 @@
 
 <button
   type="button"
-  class="button is-primary is-medium is-fullwidth is-rounded {loading && 'is-loading'}"
+  class="button is-primary is-medium is-fullwidth is-rounded {loading &&
+    'is-loading'}"
   {disabled}
   on:click={onClick}
 >
   {tradeButtonMessage}
-</button
->
+</button>

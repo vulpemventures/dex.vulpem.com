@@ -18,7 +18,7 @@
 </script>
 
 <div class="modal is-active">
-  <div class="modal-background" on:click={onCancel}></div>  
+  <div class="modal-background" on:click={onCancel} />
   <div class="modal-content box has-background-black">
     <div class="columns">
       <div class="column is-half is-offset-one-quarter">

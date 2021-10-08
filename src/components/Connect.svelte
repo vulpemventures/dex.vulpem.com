@@ -61,7 +61,11 @@
     Install Marina
   </button>
 {:else if !enabled}
-  <button class="button is-rounded is-primary" on:click={connect}> Connect with Marina </button>
+  <button class="button is-rounded is-primary" on:click={connect}>
+    Connect with Marina
+  </button>
 {:else}
-  <button class="button is-rounded is-primary" on:click={connect}> Disconnect </button>
+  <button class="button is-rounded is-primary" on:click={connect}>
+    Disconnect
+  </button>
 {/if}

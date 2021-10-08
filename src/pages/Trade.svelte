@@ -22,7 +22,8 @@
 
   import BrowserInjectIdentity from '../utils/browserInject';
 
-  const PROVIDER_ENDPOINT = 'http://btuiucyiumvdzhlnhqbnj6k5yrbwo2dlznzosicwnf6nw5aewr77elyd.onion:80';
+  const PROVIDER_ENDPOINT =
+    'http://btuiucyiumvdzhlnhqbnj6k5yrbwo2dlznzosicwnf6nw5aewr77elyd.onion:80';
   const client = new TraderClient(PROVIDER_ENDPOINT);
 
   const market = {

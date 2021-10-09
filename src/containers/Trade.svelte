@@ -161,6 +161,9 @@
       },
     });
 
+    // be sure the state is cleaned up in case of subsequent trades
+    tradeStatus = TradeStatus.WAITING;
+
     loading = true;
     showTradeModal = true;
 
@@ -235,6 +238,7 @@
       />
     </div>
   </div>
+  <!-- SWAP -->
   <div class="field mt-3">
     <div class="control has-text-centered">
       <!-- svelte-ignore a11y-missing-attribute -->

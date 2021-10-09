@@ -23,7 +23,7 @@ jobs:
         uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: gh-pages
-          build_dir: public
+          build_dir: dist
           #fqdn: dex.vulpem.com
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

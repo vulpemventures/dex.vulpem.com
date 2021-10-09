@@ -1,14 +1,20 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const path = require('path');
-const sveltePreprocess = require('svelte-preprocess');
+
+const { preprocess } = require('./svelte.config');
 
 const mode = process.env.NODE_ENV || 'development';
 const prod = mode === 'production';
 
 module.exports = {
 	entry: {
-		'build/bundle': ['./src/main.ts']
+		bundle: [
+			'./src/scss/main.scss',
+			'./src/main.ts'
+		]
 	},
 	resolve: {
 		alias: {
@@ -22,7 +28,7 @@ module.exports = {
 		}
 	},
 	output: {
-		path: path.join(__dirname, '/public'),
+		path: path.join(__dirname, 'dist'),
 		filename: '[name].js',
 		chunkFilename: '[name].[id].js'
 	},
@@ -42,9 +48,19 @@ module.exports = {
 						},
 						emitCss: prod,
 						hotReload: !prod,
-						preprocess: sveltePreprocess({ sourceMap: !prod })
+						preprocess,
 					}
 				}
+			},
+			{
+				test: /\.(scss|sass)$/,
+				use: [
+					{
+						loader: MiniCssExtractPlugin.loader
+					},
+					'css-loader',
+					'sass-loader'
+				]
 			},
 			{
 				test: /\.css$/,
@@ -68,10 +84,16 @@ module.exports = {
 	},
 	mode,
 	plugins: [
+		new CleanWebpackPlugin(),
 		new MiniCssExtractPlugin({
 			filename: '[name].css'
 		}),
 		new NodePolyfillPlugin(),
+		new CopyPlugin({
+      patterns: [
+        { from: "public" },
+      ],
+    }),
 	],
 	devtool: prod ? false : 'source-map',
 	devServer: {

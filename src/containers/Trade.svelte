@@ -14,7 +14,7 @@
   import CoinRow from '../components/CoinRow.svelte';
   import TradeButton from '../components/TradeButton.svelte';
   import SelectCoinModal from '../components/SelectCoinModal.svelte';
-  import TradeModal from '../components/TradeModal.svelte'
+  import TradeModal from '../components/TradeModal.svelte';
   import {
     Coin,
     Direction,
@@ -49,8 +49,8 @@
   let tradeError = undefined;
   let tradeStatus = TradeStatus.WAITING;
 
-  $: tradeButton = !isWalletConnected 
-    ? TradeButtonStatus.ConnectWallet 
+  $: tradeButton = !isWalletConnected
+    ? TradeButtonStatus.ConnectWallet
     : !isValidPair(sendCoin, receiveCoin)
     ? TradeButtonStatus.InvalidPair
     : !isValidAmount(sendAmount) || !isValidAmount(receiveAmount)
@@ -178,7 +178,9 @@
 
       const isBuy = hash === provider.market.quoteAsset;
 
-      console.debug(`trading ${amountToBeSentInSatoshis} of ${sendCoin} for ${receiveCoin}...`);
+      console.debug(
+        `trading ${amountToBeSentInSatoshis} of ${sendCoin} for ${receiveCoin}...`
+      );
 
       if (isBuy) {
         txid = await trade.buy({
@@ -197,7 +199,6 @@
       }
 
       tradeStatus = TradeStatus.COMPLETED;
-
     } catch (e) {
       console.error(e);
       tradeStatus = TradeStatus.ERROR;
@@ -269,13 +270,16 @@
   </div>
 </form>
 <SelectCoinModal bind:active={showCoinModal} on:selected={onCoinSelected} />
-<TradeModal 
-  bind:active={showTradeModal} 
+<TradeModal
+  bind:active={showTradeModal}
   status={tradeStatus}
   error={tradeError}
-  {txid} {sendAmount} {sendCoin} {receiveAmount} {receiveCoin} 
+  {txid}
+  {sendAmount}
+  {sendCoin}
+  {receiveAmount}
+  {receiveCoin}
 />
-
 
 <style>
   .coin-button {

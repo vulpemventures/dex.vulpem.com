@@ -3,7 +3,6 @@
   import SuccessIcon from './SuccessIcon.svelte';
   import ErrorIcon from './ErrorIcon.svelte';
 
-
   export let active: boolean;
 
   export let status: TradeStatus;
@@ -44,7 +43,7 @@
           <SuccessIcon />
           <div class="block mt-6 mb-3">
             <h1 class="title has-text-white">Trade Completed</h1>
-            <a 
+            <a
               target="_blank"
               href={'https://blockstream.info/liquid/tx/' + txid}
             >
@@ -59,20 +58,20 @@
             </button>
           </div>
         {:else}
-        <ErrorIcon />
-        <div class="block mt-6 mb-3">
-          <h1 class="title has-text-white">Something went wrong</h1>
-          <p class="subtitle">
-            {error}
-          </p>
-          <button
-            type="button"
-            class="button is-primary is-medium is-fullwidth is-rounded mt-6"
-            on:click={onCancel}
-          >
-            Close
-          </button>
-        </div>
+          <ErrorIcon />
+          <div class="block mt-6 mb-3">
+            <h1 class="title has-text-white">Something went wrong</h1>
+            <p class="subtitle">
+              {error}
+            </p>
+            <button
+              type="button"
+              class="button is-primary is-medium is-fullwidth is-rounded mt-6"
+              on:click={onCancel}
+            >
+              Close
+            </button>
+          </div>
         {/if}
       </div>
     </div>

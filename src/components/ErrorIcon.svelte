@@ -3,5 +3,5 @@
 </script>
 
 <figure class="image is-128x128 is-inline-block">
-  <img src={ErrorLogo} alt="succes logo">
+  <img src={ErrorLogo} alt="succes logo" />
 </figure>

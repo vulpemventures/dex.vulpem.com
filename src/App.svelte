@@ -3,7 +3,7 @@
   import Connect from './containers/Connect.svelte';
 </script>
 
-<section class="hero has-background-dark is-fullheight">
+<section class="hero has-background-black-bis is-fullheight">
   <!-- Hero head: will stick at the top -->
   <div class="hero-head">
     <div class="container is-max-desktop has-text-right mt-3 mr-3">

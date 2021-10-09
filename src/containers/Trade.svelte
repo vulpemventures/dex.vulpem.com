@@ -12,6 +12,7 @@
   import { marinaStore, MarinaStore } from '../stores/store';
 
   import CoinRow from '../components/CoinRow.svelte';
+  import ArrowDownIcon from '../components/ArrowDownIcon.svelte';
   import TradeButton from '../components/TradeButton.svelte';
   import SelectCoinModal from '../components/SelectCoinModal.svelte';
   import TradeModal from '../components/TradeModal.svelte';
@@ -26,7 +27,7 @@
   import BrowserInjectIdentity from '../utils/browserInject';
   import { isValidAmount, isValidPair } from '../utils/checks';
   import { getProviderByPair } from '../utils/tdex';
-
+  
   let isWalletConnected = false;
   const unsubscribe = marinaStore.subscribe((s: MarinaStore) => {
     isWalletConnected = s.enabled;
@@ -242,7 +243,9 @@
   <div class="field mt-3">
     <div class="control has-text-centered">
       <!-- svelte-ignore a11y-missing-attribute -->
-      <a on:click={onSwap}> ⬇️ </a>
+      <a on:click={onSwap}>
+        <ArrowDownIcon />
+      </a>
     </div>
   </div>
   <!-- TO -->

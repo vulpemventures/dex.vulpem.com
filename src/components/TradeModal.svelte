@@ -23,7 +23,7 @@
   <div class="modal-background" on:click={onCancel} />
   <div class="modal-content box has-background-black">
     <div class="columns">
-      <div class="column is-full has-text-centered">
+      <div class="column is-full has-text-centered mt-6">
         {#if status === TradeStatus.WAITING}
           <div class="loader-wrapper is-active">
             <div class="loader is-loading" />
@@ -42,7 +42,7 @@
         {:else if status === TradeStatus.COMPLETED}
           <SuccessIcon />
           <div class="block mt-6 mb-3">
-            <h1 class="title has-text-white">Trade Completed</h1>
+            <h1 class="title is-3 has-text-white">Trade Completed</h1>
             <a
               target="_blank"
               href={'https://blockstream.info/liquid/tx/' + txid}
@@ -51,7 +51,7 @@
             </a>
             <button
               type="button"
-              class="button is-primary is-medium is-fullwidth is-rounded mt-6"
+              class="button is-primary is-medium is-rounded mt-6"
               on:click={onCancel}
             >
               Close
@@ -66,7 +66,7 @@
             </p>
             <button
               type="button"
-              class="button is-primary is-medium is-fullwidth is-rounded mt-6"
+              class="button is-primary is-medium is-rounded mt-6"
               on:click={onCancel}
             >
               Close

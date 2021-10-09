@@ -1,6 +1,6 @@
 <script>
-  import Trade from './pages/Trade.svelte';
-  import Connect from './components/Connect.svelte';
+  import Trade from './containers/Trade.svelte';
+  import Connect from './containers/Connect.svelte';
 </script>
 
 <section class="hero has-background-dark is-fullheight">

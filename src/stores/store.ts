@@ -1,19 +1,17 @@
 import { writable } from 'svelte/store';
 
-const storeName = "dexStore";
-
 
 export interface MarinaStore {
   installed: boolean;
   enabled: boolean;
 }
 
+const initialState = { installed: false, enabled: false, network:"liquid" }
 
-
-export const marinaStore = writable<MarinaStore>({installed: false, enabled: false});
-
+export const marinaStore = writable<MarinaStore>(initialState);
 
 /* 
+const storeName = "dexStore";
 interface State {
   swap: any;
 }

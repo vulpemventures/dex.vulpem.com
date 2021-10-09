@@ -6,8 +6,14 @@ export const enum Direction {
 export const enum TradeButtonStatus {
   Trade = "Trade",
   EnterAmount = "Enter an amount",
-  SelectAsset = "Select an asset",
   InvalidPair = "Pair not supported",
+  ConnectWallet = "Connect wallet"
+}
+
+export const enum TradeStatus {
+  WAITING,
+  COMPLETED,
+  ERROR
 }
 
 export enum Coin {

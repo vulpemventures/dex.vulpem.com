@@ -13,7 +13,7 @@
 
   $: disabled =
     type === TradeButtonStatus.EnterAmount ||
-    type === TradeButtonStatus.SelectAsset ||
+    type === TradeButtonStatus.ConnectWallet ||
     type === TradeButtonStatus.InvalidPair;
   $: tradeButtonMessage = type;
 </script>

@@ -17,7 +17,7 @@
   };
 </script>
 
-<div class="modal is-active">
+<div class="modal {active && 'is-active'}">
   <div class="modal-background" on:click={onCancel} />
   <div class="modal-content box has-background-black">
     <div class="columns">

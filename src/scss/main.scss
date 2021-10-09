@@ -23,3 +23,20 @@ $modal-background-background-color: "transparent";
 
 // Import the rest of Bulma
 @import "node_modules/bulma/bulma";
+
+.loader-wrapper {
+  transition: opacity .3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+    .loader {
+      height: 80px;
+      width: 80px;
+    }
+    
+  &.is-active {
+      opacity: 1;
+      z-index: 1;
+  }
+}

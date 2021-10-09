@@ -45,7 +45,6 @@
     });
 
     await marina.on('DISABLED', () => {
-      console.log('disabled');
       notifyDisabled();
     });
   });

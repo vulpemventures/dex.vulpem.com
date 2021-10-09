@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import {
     Trade,
     IdentityType,
@@ -8,19 +9,28 @@
     UtxoInterface,
   } from 'tdex-sdk';
 
+  import { marinaStore, MarinaStore } from '../stores/store';
+
   import CoinRow from '../components/CoinRow.svelte';
   import TradeButton from '../components/TradeButton.svelte';
-  import SelectCoin from '../components/SelectCoin.svelte';
+  import SelectCoinModal from '../components/SelectCoinModal.svelte';
+  import TradeModal from '../components/TradeModal.svelte'
   import {
     Coin,
     Direction,
     TradeButtonStatus,
     CoinToAssetByChain,
+    TradeStatus,
   } from '../constants';
 
   import BrowserInjectIdentity from '../utils/browserInject';
   import { isValidAmount, isValidPair } from '../utils/checks';
   import { getProviderByPair } from '../utils/tdex';
+
+  let isWalletConnected = false;
+  const unsubscribe = marinaStore.subscribe((s: MarinaStore) => {
+    isWalletConnected = s.enabled;
+  });
 
   let sendCoin = Coin.Bitcoin;
   let receiveCoin = Coin.Tether;
@@ -29,19 +39,27 @@
   let receiveAmount = undefined;
 
   let showCoinModal = false;
+  let showTradeModal = false;
+
   let activeInputDirection = Direction.RECEIVE;
 
   let loading = false;
 
-  $: tradeButton = !isValidPair(sendCoin, receiveCoin)
+  let txid = undefined;
+  let tradeError = undefined;
+  let tradeStatus = TradeStatus.WAITING;
+
+  $: tradeButton = !isWalletConnected 
+    ? TradeButtonStatus.ConnectWallet 
+    : !isValidPair(sendCoin, receiveCoin)
     ? TradeButtonStatus.InvalidPair
-    : isValidAmount(sendAmount) && isValidAmount(receiveAmount)
-    ? TradeButtonStatus.Trade
-    : TradeButtonStatus.EnterAmount;
+    : !isValidAmount(sendAmount) || !isValidAmount(receiveAmount)
+    ? TradeButtonStatus.EnterAmount
+    : TradeButtonStatus.Trade;
 
   let provider = getProviderByPair([sendCoin, receiveCoin]);
 
-  const showModal = (direction: Direction) => {
+  const onCoinClick = (direction: Direction) => {
     activeInputDirection = direction;
     showCoinModal = !showCoinModal;
   };
@@ -71,7 +89,7 @@
   };
 
   const onSendAmountChange = async () => {
-    console.log('send changing...');
+    console.debug('send changing...');
 
     if (!isValidAmount(sendAmount)) return;
     if (!isValidPair(sendCoin, receiveCoin)) return;
@@ -103,7 +121,7 @@
   };
 
   const onReceiveAmountChange = async () => {
-    console.log('receive changing...');
+    console.debug('receive changing...');
 
     if (!isValidAmount(receiveAmount)) return;
     if (!isValidPair(sendCoin, receiveCoin)) return;
@@ -144,13 +162,10 @@
     });
 
     loading = true;
+    showTradeModal = true;
 
     try {
-      // THIS not, I got TypeError: Cannot read properties of undefined (reading 'script')
       const utxos = await window.marina.getCoins();
-
-      console.log(utxos);
-
       const trade = new Trade({
         providerUrl: provider.endpoint,
         explorerUrl: 'https://blockstream.info/liquid/api',
@@ -163,9 +178,8 @@
 
       const isBuy = hash === provider.market.quoteAsset;
 
-      console.log(isBuy, amountToBeSentInSatoshis, hash, provider.market);
+      console.debug(`trading ${amountToBeSentInSatoshis} of ${sendCoin} for ${receiveCoin}...`);
 
-      let txid;
       if (isBuy) {
         txid = await trade.buy({
           market: provider.market,
@@ -182,13 +196,18 @@
         });
       }
 
-      console.log(txid);
+      tradeStatus = TradeStatus.COMPLETED;
+
     } catch (e) {
       console.error(e);
+      tradeStatus = TradeStatus.ERROR;
+      tradeError = (e as Error).message;
     } finally {
       loading = false;
     }
   };
+
+  onDestroy(unsubscribe);
 </script>
 
 <form class="box has-background-black">
@@ -200,7 +219,7 @@
       <button
         type="button"
         class="button is-large is-white coin-button has-background-dark"
-        on:click={() => showModal(Direction.SEND)}
+        on:click={() => onCoinClick(Direction.SEND)}
       >
         <CoinRow name={sendCoin} showTicker />
       </button>
@@ -227,7 +246,7 @@
       <button
         type="button"
         class="button is-large is-white coin-button has-background-dark"
-        on:click={() => showModal(Direction.RECEIVE)}
+        on:click={() => onCoinClick(Direction.RECEIVE)}
       >
         <CoinRow name={receiveCoin} showTicker />
       </button>
@@ -249,9 +268,14 @@
     </div>
   </div>
 </form>
-{#if showCoinModal}
-  <SelectCoin bind:active={showCoinModal} on:selected={onCoinSelected} />
-{/if}
+<SelectCoinModal bind:active={showCoinModal} on:selected={onCoinSelected} />
+<TradeModal 
+  bind:active={showTradeModal} 
+  status={tradeStatus}
+  error={tradeError}
+  {txid} {sendAmount} {sendCoin} {receiveAmount} {receiveCoin} 
+/>
+
 
 <style>
   .coin-button {

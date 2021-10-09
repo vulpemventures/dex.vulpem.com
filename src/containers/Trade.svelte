@@ -27,7 +27,7 @@
   import BrowserInjectIdentity from '../utils/browserInject';
   import { isValidAmount, isValidPair } from '../utils/checks';
   import { getProviderByPair } from '../utils/tdex';
-  
+
   let isWalletConnected = false;
   const unsubscribe = marinaStore.subscribe((s: MarinaStore) => {
     isWalletConnected = s.enabled;

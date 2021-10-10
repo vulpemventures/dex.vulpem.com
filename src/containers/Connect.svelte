@@ -35,8 +35,11 @@
     if (!marina) return;
     notifyInstalled();
 
-    if (await marina.isEnabled()) {
+    const isEnabled = await marina.isEnabled();
+    if (isEnabled) {
       notifyEnabled();
+    } else {
+      notifyDisabled();
     }
 
     // Start listening to ENABLED and DISABLED events and binds to the state

@@ -180,8 +180,8 @@
         utxos: utxos.filter((u) => (u as UtxoInterface).prevout),
       });
 
-      const { hash } = CoinToAssetByChain['liquid'][sendCoin];
-      const amountToBeSentInSatoshis = sendAmount * Math.pow(10, 8);
+      const { hash, precision } = CoinToAssetByChain['liquid'][sendCoin];
+      const amountToBeSentInSatoshis = toSatoshi(sendAmount, precision);
 
       const isBuy = hash === provider.market.quoteAsset;
 
@@ -192,14 +192,14 @@
       if (isBuy) {
         txid = await trade.buy({
           market: provider.market,
-          amount: amountToBeSentInSatoshis,
+          amount: amountToBeSentInSatoshis.toNumber(),
           asset: hash,
           identity,
         });
       } else {
         txid = await trade.sell({
           market: provider.market,
-          amount: amountToBeSentInSatoshis,
+          amount: amountToBeSentInSatoshis.toNumber(),
           asset: hash,
           identity,
         });

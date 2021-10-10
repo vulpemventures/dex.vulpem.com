@@ -1,7 +1,7 @@
 import { address, AddressInterface, BrowserInject, IdentityOpts, InjectOpts } from 'ldk';
 import type { MarinaProvider } from 'marina-provider';
 
-export default class BrowserInjectOpenDex extends BrowserInject {
+export default class BrowserInjectTDEX extends BrowserInject {
   private _provider: MarinaProvider;
   private blindKeyByScript: Record<string, string> = {};
 

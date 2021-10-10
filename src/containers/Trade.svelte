@@ -24,9 +24,10 @@
     TradeStatus,
   } from '../constants';
 
+  import { getProviderByPair } from '../utils/tdex';
+  import { fromSatoshi, toSatoshi } from '../utils/format';
   import BrowserInjectIdentity from '../utils/browserInject';
   import { isValidAmount, isValidPair } from '../utils/checks';
-  import { getProviderByPair } from '../utils/tdex';
 
   let isWalletConnected = false;
   const unsubscribe = marinaStore.subscribe((s: MarinaStore) => {
@@ -90,29 +91,30 @@
   };
 
   const onSendAmountChange = async () => {
-    console.debug('send changing...');
-
     if (!isValidAmount(sendAmount)) return;
     if (!isValidPair(sendCoin, receiveCoin)) return;
 
     loading = true;
 
-    const assetHash = CoinToAssetByChain['liquid'][sendCoin].hash;
-    const isBaseComingIn = assetHash === provider.market.baseAsset;
+    const { hash, precision } = CoinToAssetByChain['liquid'][sendCoin];
+    const isBaseComingIn = hash === provider.market.baseAsset;
     const tradeType = isBaseComingIn ? TradeType.SELL : TradeType.BUY;
 
-    const amountInSatoshis = sendAmount * Math.pow(10, 8);
+    const amountInSatoshis = toSatoshi(sendAmount, precision);
 
     try {
       const client = new TraderClient(provider.endpoint);
       const [firstPrice] = await client.marketPrice(
         provider.market,
         tradeType,
-        amountInSatoshis,
-        assetHash
+        amountInSatoshis.toNumber(),
+        hash
       );
 
-      receiveAmount = firstPrice.amount / Math.pow(10, 8);
+      receiveAmount = fromSatoshi(
+        firstPrice.amount.toString(),
+        CoinToAssetByChain['liquid'][receiveCoin].precision
+      ).toString();
     } catch (err: unknown) {
       (tradeButton as any) = (err as Error).message;
       console.error(err);
@@ -122,29 +124,30 @@
   };
 
   const onReceiveAmountChange = async () => {
-    console.debug('receive changing...');
-
     if (!isValidAmount(receiveAmount)) return;
     if (!isValidPair(sendCoin, receiveCoin)) return;
 
     loading = true;
 
-    const assetHash = CoinToAssetByChain['liquid'][receiveCoin].hash;
-    const isBaseComingIn = assetHash === provider.market.baseAsset;
+    const { hash, precision } = CoinToAssetByChain['liquid'][receiveCoin];
+    const isBaseComingIn = hash === provider.market.quoteAsset;
     const tradeType = isBaseComingIn ? TradeType.SELL : TradeType.BUY;
 
-    const amountInSatoshis = receiveAmount * Math.pow(10, 8);
+    const amountInSatoshis = toSatoshi(receiveAmount, precision);
 
     try {
       const client = new TraderClient(provider.endpoint);
       const [firstPrice] = await client.marketPrice(
         provider.market,
         tradeType,
-        amountInSatoshis,
-        assetHash
+        amountInSatoshis.toNumber(),
+        hash
       );
 
-      sendAmount = firstPrice.amount / Math.pow(10, 8);
+      sendAmount = fromSatoshi(
+        firstPrice.amount.toString(),
+        CoinToAssetByChain['liquid'][sendCoin].precision
+      ).toString();
     } catch (err: unknown) {
       (tradeButton as any) = (err as Error).message;
       console.error(err);
@@ -240,13 +243,11 @@
     </div>
   </div>
   <!-- SWAP -->
-  <div class="field mt-3">
-    <div class="control has-text-centered">
-      <!-- svelte-ignore a11y-missing-attribute -->
-      <a on:click={onSwap}>
-        <ArrowDownIcon />
-      </a>
-    </div>
+  <div class="has-text-centered">
+    <!-- svelte-ignore a11y-missing-attribute -->
+    <a on:click={onSwap}>
+      <ArrowDownIcon />
+    </a>
   </div>
   <!-- TO -->
   <div class="field has-addons">

@@ -1,5 +1,5 @@
 <script>
-  import ErrorLogo from '../assets/images/error.svg';
+  import ErrorLogo from '../../assets/images/error.svg';
 </script>
 
 <figure class="image is-128x128 is-inline-block">

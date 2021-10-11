@@ -7,7 +7,8 @@ export const enum TradeButtonStatus {
   Trade = "Trade",
   EnterAmount = "Enter an amount",
   InvalidPair = "Pair not supported",
-  ConnectWallet = "Connect wallet"
+  ConnectWallet = "Connect wallet",
+  ErrorPreview = "Preview not available"
 }
 
 export const enum TradeStatus {

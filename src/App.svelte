@@ -1,6 +1,8 @@
 <script>
   import Trade from './containers/Trade.svelte';
   import Connect from './containers/Connect.svelte';
+  import TdexIcon from './components/icons/TdexIcon.svelte';
+
 </script>
 
 <section class="hero has-background-black-bis is-fullheight">
@@ -16,6 +18,19 @@
       <div class="columns">
         <div class="column is-half is-offset-one-quarter">
           <Trade />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-foot">
+    <div class="container is-max-desktop">
+      <div class="columns is-mobile">
+        <div class="column is-offset-1 has-text-right">
+          <p class="subtitle">Swap powered by</p>
+        </div>
+        <div class="column">
+          <TdexIcon />
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@
   import { marinaStore, MarinaStore } from '../stores/store';
 
   import CoinRow from '../components/CoinRow.svelte';
-  import ArrowDownIcon from '../components/ArrowDownIcon.svelte';
+  import ArrowDownIcon from '../components/icons/ArrowDownIcon.svelte';
   import TradeButton from '../components/TradeButton.svelte';
   import SelectCoinModal from '../components/SelectCoinModal.svelte';
   import TradeModal from '../components/TradeModal.svelte';
@@ -116,7 +116,7 @@
         CoinToAssetByChain['liquid'][receiveCoin].precision
       ).toString();
     } catch (err: unknown) {
-      (tradeButton as any) = (err as Error).message;
+      tradeButton = TradeButtonStatus.ErrorPreview;
       console.error(err);
     } finally {
       loading = false;
@@ -149,7 +149,7 @@
         CoinToAssetByChain['liquid'][sendCoin].precision
       ).toString();
     } catch (err: unknown) {
-      (tradeButton as any) = (err as Error).message;
+      tradeButton = TradeButtonStatus.ErrorPreview;
       console.error(err);
     } finally {
       loading = false;

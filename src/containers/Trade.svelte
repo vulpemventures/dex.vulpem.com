@@ -12,7 +12,7 @@
   import { marinaStore, MarinaStore } from '../stores/store';
 
   import CoinRow from '../components/CoinRow.svelte';
-  import ArrowDownIcon from '../components/ArrowDownIcon.svelte';
+  import ArrowDownIcon from '../components/icons/ArrowDownIcon.svelte';
   import TradeButton from '../components/TradeButton.svelte';
   import SelectCoinModal from '../components/SelectCoinModal.svelte';
   import TradeModal from '../components/TradeModal.svelte';

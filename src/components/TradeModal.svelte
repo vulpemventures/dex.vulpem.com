@@ -1,7 +1,7 @@
 <script lang="ts">
   import { TradeStatus } from '../constants';
-  import SuccessIcon from './SuccessIcon.svelte';
-  import ErrorIcon from './ErrorIcon.svelte';
+  import SuccessIcon from './icons/SuccessIcon.svelte';
+  import ErrorIcon from './icons/ErrorIcon.svelte';
 
   export let active: boolean;
 

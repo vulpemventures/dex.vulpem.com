@@ -116,7 +116,7 @@
         CoinToAssetByChain['liquid'][receiveCoin].precision
       ).toString();
     } catch (err: unknown) {
-      (tradeButton as any) = (err as Error).message;
+      tradeButton = TradeButtonStatus.ErrorPreview;
       console.error(err);
     } finally {
       loading = false;
@@ -149,7 +149,7 @@
         CoinToAssetByChain['liquid'][sendCoin].precision
       ).toString();
     } catch (err: unknown) {
-      (tradeButton as any) = (err as Error).message;
+      tradeButton = TradeButtonStatus.ErrorPreview;
       console.error(err);
     } finally {
       loading = false;

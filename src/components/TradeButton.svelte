@@ -14,6 +14,7 @@
   $: disabled =
     type === TradeButtonStatus.EnterAmount ||
     type === TradeButtonStatus.ConnectWallet ||
+    type === TradeButtonStatus.ErrorPreview ||
     type === TradeButtonStatus.InvalidPair;
   $: tradeButtonMessage = type;
 </script>

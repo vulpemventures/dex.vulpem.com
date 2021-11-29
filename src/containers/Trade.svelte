@@ -235,7 +235,7 @@
     <div class="control is-expanded">
       <input
         class="input is-large has-background-dark has-text-white has-text-right"
-        type="text"
+        type="number"
         placeholder="0.00"
         bind:value={sendAmount}
         on:input={onSendAmountChange}
@@ -263,7 +263,7 @@
     <div class="control is-expanded">
       <input
         class="input is-large has-background-dark has-text-white has-text-right"
-        type="text"
+        type="number"
         placeholder="0.00"
         bind:value={receiveAmount}
         on:input={onReceiveAmountChange}

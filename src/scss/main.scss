@@ -34,9 +34,14 @@ $modal-background-background-color: "transparent";
       height: 80px;
       width: 80px;
     }
-    
+
   &.is-active {
       opacity: 1;
       z-index: 1;
   }
+}
+
+// Remove arrows from input type number
+input[type=number] {
+  -moz-appearance: textfield;
 }

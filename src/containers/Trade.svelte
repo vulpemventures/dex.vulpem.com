@@ -15,10 +15,14 @@
   import ArrowDownIcon from '../components/icons/ArrowDownIcon.svelte';
   import TradeButton from '../components/TradeButton.svelte';
   import SelectCoinModal from '../components/SelectCoinModal.svelte';
+  import SelectFiatModal from '../components/SelectFiatModal.svelte';
   import TradeModal from '../components/TradeModal.svelte';
+  import FiatValue from '../components/FiatValue.svelte';
   import {
     Coin,
+    CoinTicker,
     Direction,
+    Fiat,
     TradeButtonStatus,
     CoinToAssetByChain,
     TradeStatus,
@@ -36,11 +40,14 @@
 
   let sendCoin = Coin.Bitcoin;
   let receiveCoin = Coin.Tether;
+  let fiatCoin = Fiat.USD;
 
   let sendAmount = undefined;
   let receiveAmount = undefined;
+  let coinsRatio = undefined;
 
   let showCoinModal = false;
+  let showFiatModal = false;
   let showTradeModal = false;
 
   let activeInputDirection = Direction.RECEIVE;
@@ -69,9 +76,12 @@
   const onCoinSelected = (event: CustomEvent<{ coin: Coin }>) => {
     const { coin } = event.detail;
 
+    // clean up
+    coinsRatio = undefined;
+
     if (activeInputDirection === Direction.SEND) {
       sendCoin = coin;
-      //update the provider
+      // update the provider
       provider = getProviderByPair([sendCoin, receiveCoin]);
       // clean up
       sendAmount = undefined;
@@ -79,10 +89,21 @@
     }
 
     receiveCoin = coin;
-    //update the provider
+    // update the provider
     provider = getProviderByPair([sendCoin, receiveCoin]);
     // clean up
     receiveAmount = undefined;
+    // update values
+    onSendAmountChange();
+  };
+
+  const onFiatClick = () => {
+    showFiatModal = !showFiatModal;
+  };
+
+  const onFiatSelected = (event: CustomEvent<{ fiat: Fiat }>) => {
+    const { fiat } = event.detail;
+    fiatCoin = fiat;
   };
 
   const onSwap = () => {
@@ -90,17 +111,21 @@
     [sendAmount, receiveAmount] = [receiveAmount, sendAmount];
   };
 
-  const onSendAmountChange = async () => {
-    if (!isValidAmount(sendAmount)) return;
+  const onAmountChange = async (which) => {
+    const amount = which === 'send' ? sendAmount : receiveAmount;
+    const fromCoin = which === 'send' ? sendCoin : receiveCoin;
+    const toCoin = which === 'send' ? receiveCoin : sendCoin;
+
+    if (!isValidAmount(amount)) return;
     if (!isValidPair(sendCoin, receiveCoin)) return;
 
     loading = true;
 
-    const { hash, precision } = CoinToAssetByChain['liquid'][sendCoin];
+    const { hash, precision } = CoinToAssetByChain['liquid'][fromCoin];
     const isBaseComingIn = hash === provider.market.baseAsset;
     const tradeType = isBaseComingIn ? TradeType.SELL : TradeType.BUY;
 
-    const amountInSatoshis = toSatoshi(sendAmount, precision);
+    const amountInSatoshis = toSatoshi(amount, precision);
 
     try {
       const client = new TraderClient(provider.endpoint);
@@ -110,11 +135,19 @@
         amountInSatoshis.toNumber(),
         hash
       );
-
-      receiveAmount = fromSatoshi(
+      const precision = CoinToAssetByChain['liquid'][toCoin].precision;
+      const firstPriceAmount = fromSatoshi(
         firstPrice.amount.toString(),
-        CoinToAssetByChain['liquid'][receiveCoin].precision
-      ).toString();
+        precision,
+      );
+      coinsRatio = parseFloat(
+        (firstPriceAmount.toNumber() / amount).toFixed(precision)
+      );
+      if (which === 'send') {
+        receiveAmount = firstPriceAmount.toString();
+      } else {
+        sendAmount = firstPriceAmount.toString();
+      }
     } catch (err: unknown) {
       tradeButton = TradeButtonStatus.ErrorPreview;
       console.error(err);
@@ -122,39 +155,14 @@
       loading = false;
     }
   };
+
+  const onSendAmountChange = async () => {
+    onAmountChange('send');
+  }
 
   const onReceiveAmountChange = async () => {
-    if (!isValidAmount(receiveAmount)) return;
-    if (!isValidPair(sendCoin, receiveCoin)) return;
-
-    loading = true;
-
-    const { hash, precision } = CoinToAssetByChain['liquid'][receiveCoin];
-    const isBaseComingIn = hash === provider.market.quoteAsset;
-    const tradeType = isBaseComingIn ? TradeType.SELL : TradeType.BUY;
-
-    const amountInSatoshis = toSatoshi(receiveAmount, precision);
-
-    try {
-      const client = new TraderClient(provider.endpoint);
-      const [firstPrice] = await client.marketPrice(
-        provider.market,
-        tradeType,
-        amountInSatoshis.toNumber(),
-        hash
-      );
-
-      sendAmount = fromSatoshi(
-        firstPrice.amount.toString(),
-        CoinToAssetByChain['liquid'][sendCoin].precision
-      ).toString();
-    } catch (err: unknown) {
-      tradeButton = TradeButtonStatus.ErrorPreview;
-      console.error(err);
-    } finally {
-      loading = false;
-    }
-  };
+    onAmountChange('receive');
+  }
 
   const onTradeSubmit = async () => {
     const identity = new BrowserInjectIdentity({
@@ -219,10 +227,15 @@
 </script>
 
 <form class="box has-background-black">
-  <h1 class="title has-text-white">Trade</h1>
+  <div class="is-flex is-justify-content-space-between is-align-items-baseline">
+    <h1 class="title has-text-white">Trade</h1>
+    {#if coinsRatio}
+      <p>1 {CoinTicker[sendCoin]} = {coinsRatio} {CoinTicker[receiveCoin]}</p>
+    {/if}
+  </div>
 
   <!-- FROM -->
-  <div class="field has-addons">
+  <div class="field has-addons has-background-dark">
     <div class="control">
       <button
         type="button"
@@ -240,6 +253,10 @@
         bind:value={sendAmount}
         on:input={onSendAmountChange}
       />
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <a on:click={() => onFiatClick()}>
+        <FiatValue coin={sendCoin} amount={sendAmount} fiat={fiatCoin} />
+      </a>
     </div>
   </div>
   <!-- SWAP -->
@@ -250,7 +267,7 @@
     </a>
   </div>
   <!-- TO -->
-  <div class="field has-addons">
+  <div class="field has-addons has-background-dark">
     <div class="control">
       <button
         type="button"
@@ -268,6 +285,10 @@
         bind:value={receiveAmount}
         on:input={onReceiveAmountChange}
       />
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <a on:click={() => onFiatClick()}>
+        <FiatValue coin={receiveCoin} amount={receiveAmount} fiat={fiatCoin} />
+      </a>
     </div>
   </div>
 
@@ -278,6 +299,7 @@
   </div>
 </form>
 <SelectCoinModal bind:active={showCoinModal} on:selected={onCoinSelected} />
+<SelectFiatModal bind:active={showFiatModal} on:selected={onFiatSelected} />
 <TradeModal
   bind:active={showTradeModal}
   status={tradeStatus}

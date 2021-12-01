@@ -1,4 +1,5 @@
 <script>
+  import { isValidAmount } from '../utils/checks';
   import { CoinGeckoId, FiatSymbol } from '../constants';
 
   export let coin;
@@ -15,6 +16,7 @@
     if (!res.ok) throw new Error(json);
 
     const value = (json[0].current_price * amount).toFixed(2);
+    if (!isValidAmount(value)) return;
     return `${FiatSymbol[fiat]} ${value}`;
   }
 
@@ -31,7 +33,9 @@
 
 {#if visible}
   {#await promise then value}
-    <p>{value}</p>
+    {#if value}
+      <p>{value}</p>
+    {/if}
   {/await}
 {/if}
 

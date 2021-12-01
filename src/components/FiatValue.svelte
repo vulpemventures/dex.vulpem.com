@@ -13,7 +13,7 @@
     const json = await res.json();
 
     if (!res.ok) throw new Error(json);
-    
+
     const value = (json[0].current_price * amount).toFixed(2);
     return `${FiatSymbol[fiat]} ${value}`;
   }

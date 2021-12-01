@@ -29,6 +29,26 @@ export const CoinTicker: Record<string,string> = {
   [Coin.LCAD]: "LCAD"
 };
 
+export enum Fiat {
+  CAD = "Canadian dollar",
+  EUR = "Euro",
+  USD = "US dollar",
+};
+
+export const FiatSymbol: Record<string,string> = {
+  [Fiat.CAD]: "C$",
+  [Fiat.EUR]: "€",
+  [Fiat.USD]: "$"
+};
+
+// used on FiatValue component
+export const CoinGeckoId: Record<string,string> = {
+  [Coin.Bitcoin]: "bitcoin",
+  [Coin.Tether]: "tether",
+  [Fiat.CAD]: "cad",
+  [Fiat.EUR]: "eur",
+  [Fiat.USD]: "usd",
+};
 
 const LIQUID_BTC = '6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d';
 const LIQUID_USDT = 'ce091c998b83c78bb71a632313ba3760f1763d9cfcffae02258ffa9865a37bd2';

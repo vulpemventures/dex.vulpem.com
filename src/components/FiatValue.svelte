@@ -1,5 +1,5 @@
 <script>
-  import { CoinGeckoId, FiatSymbol } from "../constants";
+  import { CoinGeckoId, FiatSymbol } from '../constants';
 
   export let coin;
   export let amount;
@@ -9,16 +9,16 @@
     if (!id || !amount || !currency) return;
 
     const endpoint = 'https://api.coingecko.com/api/v3/coins/markets';
-		const res = await fetch(`${endpoint}?vs_currency=${currency}&ids=${id}`);
-		const json = await res.json();
+    const res = await fetch(`${endpoint}?vs_currency=${currency}&ids=${id}`);
+    const json = await res.json();
 
-		if (res.ok) {
+    if (res.ok) {
       const value = (json[0].current_price * amount).toFixed(2);
       return `${FiatSymbol[fiat]} ${value}`;
-		} else {
-			throw new Error(json);
-		}
-	}
+    } else {
+      throw new Error(json);
+    }
+  }
 
   let id;
   let currency;
@@ -26,7 +26,7 @@
   let visible;
 
   $: id = CoinGeckoId[coin];
-  $: currency = CoinGeckoId[fiat]
+  $: currency = CoinGeckoId[fiat];
   $: promise = getValue(id, amount, currency);
   $: visible = amount && id;
 </script>

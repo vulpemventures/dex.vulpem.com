@@ -138,7 +138,7 @@
       const precision = CoinToAssetByChain['liquid'][toCoin].precision;
       const firstPriceAmount = fromSatoshi(
         firstPrice.amount.toString(),
-        precision,
+        precision
       );
       coinsRatio = parseFloat(
         (firstPriceAmount.toNumber() / amount).toFixed(precision)
@@ -158,11 +158,11 @@
 
   const onSendAmountChange = async () => {
     onAmountChange('send');
-  }
+  };
 
   const onReceiveAmountChange = async () => {
     onAmountChange('receive');
-  }
+  };
 
   const onTradeSubmit = async () => {
     const identity = new BrowserInjectIdentity({

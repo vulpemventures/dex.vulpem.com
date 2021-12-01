@@ -12,12 +12,10 @@
     const res = await fetch(`${endpoint}?vs_currency=${currency}&ids=${id}`);
     const json = await res.json();
 
-    if (res.ok) {
-      const value = (json[0].current_price * amount).toFixed(2);
-      return `${FiatSymbol[fiat]} ${value}`;
-    } else {
-      throw new Error(json);
-    }
+    if (!res.ok) throw new Error(json);
+    
+    const value = (json[0].current_price * amount).toFixed(2);
+    return `${FiatSymbol[fiat]} ${value}`;
   }
 
   let id;

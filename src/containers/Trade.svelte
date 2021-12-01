@@ -26,6 +26,7 @@
     TradeButtonStatus,
     CoinToAssetByChain,
     TradeStatus,
+    AmountTooBigErrorMessage,
   } from '../constants';
 
   import { getProviderByPair } from '../utils/tdex';
@@ -148,8 +149,11 @@
       } else {
         sendAmount = firstPriceAmount.toString();
       }
-    } catch (err: unknown) {
-      tradeButton = TradeButtonStatus.ErrorPreview;
+    } catch (err: any) {
+      tradeButton =
+        err?.message === AmountTooBigErrorMessage
+          ? TradeButtonStatus.AmountTooBig
+          : TradeButtonStatus.ErrorPreview;
       console.error(err);
     } finally {
       loading = false;

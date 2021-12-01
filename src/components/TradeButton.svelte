@@ -15,6 +15,7 @@
     type === TradeButtonStatus.EnterAmount ||
     type === TradeButtonStatus.ConnectWallet ||
     type === TradeButtonStatus.ErrorPreview ||
+    type === TradeButtonStatus.AmountTooBig ||
     type === TradeButtonStatus.InvalidPair;
   $: tradeButtonMessage = type;
 </script>

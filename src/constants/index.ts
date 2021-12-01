@@ -8,7 +8,8 @@ export const enum TradeButtonStatus {
   EnterAmount = "Enter an amount",
   InvalidPair = "Pair not supported",
   ConnectWallet = "Connect wallet",
-  ErrorPreview = "Preview not available"
+  ErrorPreview = "Preview not available",
+  AmountTooBig = "Amount too big",
 }
 
 export const enum TradeStatus {
@@ -49,6 +50,9 @@ export const CoinGeckoId: Record<string,string> = {
   [Fiat.EUR]: "eur",
   [Fiat.USD]: "usd",
 };
+
+// error message from TraderClient().marketPrice()
+export const AmountTooBigErrorMessage = 'provided amount is too big';
 
 const LIQUID_BTC = '6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d';
 const LIQUID_USDT = 'ce091c998b83c78bb71a632313ba3760f1763d9cfcffae02258ffa9865a37bd2';

@@ -1,15 +1,8 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
-  import {
-    Trade,
-    IdentityType,
-    greedyCoinSelector,
-    TradeType,
-    TraderClient,
-    UtxoInterface,
-  } from 'tdex-sdk';
+  import { IdentityType, TradeOrder } from 'tdex-sdk';
 
-  import { marinaStore, MarinaStore } from '../stores/store';
+  import { marinaStore } from '../stores/store';
+  import { coinStore } from '../stores/coinstore';
 
   import CoinRow from '../components/CoinRow.svelte';
   import ArrowDownIcon from '../components/icons/ArrowDownIcon.svelte';
@@ -19,27 +12,42 @@
   import TradeModal from '../components/TradeModal.svelte';
   import FiatValue from '../components/FiatValue.svelte';
   import {
-    Coin,
-    CoinTicker,
-    Direction,
     Fiat,
     TradeButtonStatus,
-    CoinToAssetByChain,
     TradeStatus,
+    LIQUID_BTC,
+    LIQUID_USDT,
+    EXPLORER,
   } from '../constants';
 
-  import { getProviderByPair } from '../utils/tdex';
+  import {
+    calculateMarketPrice,
+    computeOrders,
+    discoverBestOrder,
+    makeTrade,
+  } from '../utils/tdex';
+
   import { fromSatoshi, toSatoshi } from '../utils/format';
   import BrowserInjectIdentity from '../utils/browserInject';
-  import { isValidAmount, isValidPair } from '../utils/checks';
+  import { isValidAmount } from '../utils/checks';
+  import { Direction, Coin, CoinPair, coinPairToPair } from '../utils/types';
+  import { allTradableAssets, tdexStore } from '../stores/tdexstore';
 
-  let isWalletConnected = false;
-  const unsubscribe = marinaStore.subscribe((s: MarinaStore) => {
-    isWalletConnected = s.enabled;
+  let activeInputDirection: Direction = 'send';
+  let pair: CoinPair = {
+    send: coinStore.getCoin(LIQUID_BTC),
+    receive: coinStore.getCoin(LIQUID_USDT),
+  };
+  $: orders = computeOrders(coinPairToPair(pair), $tdexStore.markets);
+
+  let bestOrder: TradeOrder = undefined;
+
+  allTradableAssets.subscribe((assets) => {
+    coinStore.updateWithAssets(assets);
   });
 
-  let sendCoin = Coin.Bitcoin;
-  let receiveCoin = Coin.Tether;
+  $: tradableCoins = $allTradableAssets.map((a) => coinStore.getCoin(a));
+
   let fiatCoin = Fiat.USD;
 
   let sendAmount = undefined;
@@ -50,23 +58,19 @@
   let showFiatModal = false;
   let showTradeModal = false;
 
-  let activeInputDirection = Direction.RECEIVE;
-
   let loading = false;
 
   let txid = undefined;
   let tradeError = undefined;
   let tradeStatus = TradeStatus.WAITING;
 
-  $: tradeButton = !isWalletConnected
+  $: tradeButton = !$marinaStore.enabled
     ? TradeButtonStatus.ConnectWallet
-    : !isValidPair(sendCoin, receiveCoin)
+    : orders.length === 0
     ? TradeButtonStatus.InvalidPair
     : !isValidAmount(sendAmount) || !isValidAmount(receiveAmount)
     ? TradeButtonStatus.EnterAmount
     : TradeButtonStatus.Trade;
-
-  let provider = getProviderByPair([sendCoin, receiveCoin]);
 
   const onCoinClick = (direction: Direction) => {
     activeInputDirection = direction;
@@ -75,26 +79,17 @@
 
   const onCoinSelected = (event: CustomEvent<{ coin: Coin }>) => {
     const { coin } = event.detail;
-
     // clean up
     coinsRatio = undefined;
+    pair[activeInputDirection] = coin;
 
-    if (activeInputDirection === Direction.SEND) {
-      sendCoin = coin;
-      // update the provider
-      provider = getProviderByPair([sendCoin, receiveCoin]);
-      // clean up
+    if (activeInputDirection === 'send') {
       sendAmount = undefined;
-      return;
+    } else {
+      receiveAmount = undefined;
     }
 
-    receiveCoin = coin;
-    // update the provider
-    provider = getProviderByPair([sendCoin, receiveCoin]);
-    // clean up
-    receiveAmount = undefined;
-    // update values
-    onSendAmountChange();
+    onAmountChange(activeInputDirection);
   };
 
   const onFiatClick = () => {
@@ -107,46 +102,62 @@
   };
 
   const onSwap = () => {
-    [sendCoin, receiveCoin] = [receiveCoin, sendCoin];
+    pair = {
+      send: pair.receive,
+      receive: pair.send,
+    };
     [sendAmount, receiveAmount] = [receiveAmount, sendAmount];
+    onSendAmountChange();
   };
 
-  const onAmountChange = async (which) => {
+  const onAmountChange = (which: Direction) => async () => {
     const amount = which === 'send' ? sendAmount : receiveAmount;
-    const fromCoin = which === 'send' ? sendCoin : receiveCoin;
-    const toCoin = which === 'send' ? receiveCoin : sendCoin;
+    const fromCoin = which === 'send' ? pair.send : pair.receive;
+    const toCoin = which === 'send' ? pair.receive : pair.send;
 
     if (!isValidAmount(amount)) return;
-    if (!isValidPair(sendCoin, receiveCoin)) return;
 
     loading = true;
 
-    const { hash, precision } = CoinToAssetByChain['liquid'][fromCoin];
-    const isBaseComingIn = hash === provider.market.baseAsset;
-    const tradeType = isBaseComingIn ? TradeType.SELL : TradeType.BUY;
+    if (!amount) {
+      if (which === 'send') {
+        receiveAmount = undefined;
+      } else {
+        sendAmount = undefined;
+      }
 
-    const amountInSatoshis = toSatoshi(amount, precision);
+      loading = false;
+      return; // skip if undefined
+    }
 
     try {
-      const client = new TraderClient(provider.endpoint);
-      const [firstPrice] = await client.marketPrice(
-        provider.market,
-        tradeType,
-        amountInSatoshis.toNumber(),
-        hash
+      if (orders.length === 0) {
+        throw new Error('No orders available');
+      }
+      const amountInSatoshis = toSatoshi(amount, fromCoin.precision);
+      bestOrder = await discoverBestOrder(
+        orders,
+        coinPairToPair(pair),
+        which,
+        amountInSatoshis.toNumber()
       );
-      const precision = CoinToAssetByChain['liquid'][toCoin].precision;
-      const firstPriceAmount = fromSatoshi(
-        firstPrice.amount.toString(),
-        precision
+
+      // then compute price in order to update the other input
+      const toAmount = await calculateMarketPrice(
+        bestOrder,
+        fromCoin.assetHash,
+        amountInSatoshis.toNumber()
       );
+
+      const toSatoshis = fromSatoshi(toAmount, toCoin.precision);
+
       coinsRatio = parseFloat(
-        (firstPriceAmount.toNumber() / amount).toFixed(precision)
+        (toSatoshis.toNumber() / amount).toFixed(fromCoin.precision)
       );
       if (which === 'send') {
-        receiveAmount = firstPriceAmount.toString();
+        receiveAmount = toSatoshis.toString();
       } else {
-        sendAmount = firstPriceAmount.toString();
+        sendAmount = toSatoshis.toString();
       }
     } catch (err: unknown) {
       tradeButton = TradeButtonStatus.ErrorPreview;
@@ -156,13 +167,8 @@
     }
   };
 
-  const onSendAmountChange = async () => {
-    onAmountChange('send');
-  };
-
-  const onReceiveAmountChange = async () => {
-    onAmountChange('receive');
-  };
+  const onSendAmountChange = onAmountChange('send');
+  const onReceiveAmountChange = onAmountChange('receive');
 
   const onTradeSubmit = async () => {
     const identity = new BrowserInjectIdentity({
@@ -180,38 +186,24 @@
     showTradeModal = true;
 
     try {
-      const utxos = await window.marina.getCoins();
-      const trade = new Trade({
-        providerUrl: provider.endpoint,
-        explorerUrl: 'https://blockstream.info/liquid/api',
-        coinSelector: greedyCoinSelector(),
-        utxos: utxos.filter((u) => (u as UtxoInterface).prevout),
-      });
-
-      const { hash, precision } = CoinToAssetByChain['liquid'][sendCoin];
-      const amountToBeSentInSatoshis = toSatoshi(sendAmount, precision);
-
-      const isBuy = hash === provider.market.quoteAsset;
-
+      const amountToBeSentInSatoshis = toSatoshi(
+        sendAmount,
+        pair.send.precision
+      );
       console.debug(
-        `trading ${amountToBeSentInSatoshis} of ${sendCoin} for ${receiveCoin}...`
+        `trading ${amountToBeSentInSatoshis} of ${pair.send.ticker} for ${pair.receive.ticker}...`
       );
 
-      if (isBuy) {
-        txid = await trade.buy({
-          market: provider.market,
-          amount: amountToBeSentInSatoshis.toNumber(),
-          asset: hash,
-          identity,
-        });
-      } else {
-        txid = await trade.sell({
-          market: provider.market,
-          amount: amountToBeSentInSatoshis.toNumber(),
-          asset: hash,
-          identity,
-        });
-      }
+      txid = await makeTrade(
+        identity,
+        {
+          sats: amountToBeSentInSatoshis.toNumber(),
+          asset: pair.send.assetHash,
+        },
+        bestOrder,
+        $marinaStore.utxos,
+        EXPLORER
+      );
 
       tradeStatus = TradeStatus.COMPLETED;
     } catch (e) {
@@ -222,15 +214,13 @@
       loading = false;
     }
   };
-
-  onDestroy(unsubscribe);
 </script>
 
 <form class="box has-background-black">
   <div class="is-flex is-justify-content-space-between is-align-items-baseline">
     <h1 class="title has-text-white">Trade</h1>
     {#if coinsRatio}
-      <p>1 {CoinTicker[sendCoin]} = {coinsRatio} {CoinTicker[receiveCoin]}</p>
+      <p>1 {pair.send.ticker} = {coinsRatio} {pair.receive.ticker}</p>
     {/if}
   </div>
 
@@ -240,9 +230,9 @@
       <button
         type="button"
         class="button is-large is-white coin-button has-background-dark"
-        on:click={() => onCoinClick(Direction.SEND)}
+        on:click={() => onCoinClick('send')}
       >
-        <CoinRow name={sendCoin} showTicker />
+        <CoinRow coin={pair.send} showTicker />
       </button>
     </div>
     <div class="control is-expanded">
@@ -255,7 +245,7 @@
       />
       <!-- svelte-ignore a11y-missing-attribute -->
       <a on:click={() => onFiatClick()}>
-        <FiatValue coin={sendCoin} amount={sendAmount} fiat={fiatCoin} />
+        <FiatValue coin={pair.send} amount={sendAmount} fiat={fiatCoin} />
       </a>
     </div>
   </div>
@@ -272,9 +262,9 @@
       <button
         type="button"
         class="button is-large is-white coin-button has-background-dark"
-        on:click={() => onCoinClick(Direction.RECEIVE)}
+        on:click={() => onCoinClick('receive')}
       >
-        <CoinRow name={receiveCoin} showTicker />
+        <CoinRow coin={pair.receive} showTicker />
       </button>
     </div>
     <div class="control is-expanded">
@@ -287,7 +277,7 @@
       />
       <!-- svelte-ignore a11y-missing-attribute -->
       <a on:click={() => onFiatClick()}>
-        <FiatValue coin={receiveCoin} amount={receiveAmount} fiat={fiatCoin} />
+        <FiatValue coin={pair.receive} amount={receiveAmount} fiat={fiatCoin} />
       </a>
     </div>
   </div>
@@ -298,7 +288,11 @@
     </div>
   </div>
 </form>
-<SelectCoinModal bind:active={showCoinModal} on:selected={onCoinSelected} />
+<SelectCoinModal
+  {tradableCoins}
+  bind:active={showCoinModal}
+  on:selected={onCoinSelected}
+/>
 <SelectFiatModal bind:active={showFiatModal} on:selected={onFiatSelected} />
 <TradeModal
   bind:active={showTradeModal}
@@ -306,9 +300,9 @@
   error={tradeError}
   {txid}
   {sendAmount}
-  {sendCoin}
+  sendCoin={pair.send}
   {receiveAmount}
-  {receiveCoin}
+  receiveCoin={pair.receive}
 />
 
 <style>

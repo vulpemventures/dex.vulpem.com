@@ -1,12 +1,17 @@
-<script>
+<script lang="ts">
   import { isValidAmount } from '../utils/checks';
-  import { CoinGeckoId, FiatSymbol } from '../constants';
+  import { CoinGeckoId, Fiat, FiatSymbol } from '../constants';
+  import type { Coin } from '../utils/types';
 
-  export let coin;
-  export let amount;
-  export let fiat;
+  export let coin: Coin;
+  export let amount: number;
+  export let fiat: Fiat;
 
-  async function getValue(id, amount, currency) {
+  async function getValue(
+    id: string | undefined,
+    amount: number,
+    currency: string | undefined
+  ) {
     if (!id || !amount || !currency) return;
 
     const endpoint = 'https://api.coingecko.com/api/v3/coins/markets';
@@ -25,8 +30,8 @@
   let promise;
   let visible;
 
-  $: id = CoinGeckoId[coin];
-  $: currency = CoinGeckoId[fiat];
+  $: id = CoinGeckoId[coin.assetHash];
+  $: currency = CoinGeckoId[fiat.toString()];
   $: promise = getValue(id, amount, currency);
   $: visible = amount && id;
 </script>

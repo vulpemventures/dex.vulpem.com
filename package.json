@@ -40,10 +40,11 @@
     "format": "npx prettier --write src/**/*.svelte"
   },
   "dependencies": {
+    "axios": "^0.24.0",
     "bulma": "^0.9.3",
     "decimal.js": "^10.3.1",
     "marina-provider": "^1.4.3",
-    "tdex-sdk": "^1.7.3"
+    "tdex-sdk": "^1.7.7"
   },
   "prettier": {
     "tabWidth": 2,

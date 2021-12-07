@@ -31,7 +31,7 @@
   let visible;
 
   $: id = CoinGeckoId[coin.assetHash];
-  $: currency = CoinGeckoId[fiat.toString()];
+  $: currency = CoinGeckoId[fiat];
   $: promise = getValue(id, amount, currency);
   $: visible = amount && id;
 </script>

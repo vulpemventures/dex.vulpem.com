@@ -1,9 +1,7 @@
-import { derived, Readable, writable } from "svelte/store";
-import { EXPLORER } from "../constants";
-import { ASSETS } from "../constants/assets";
+import { Readable, writable } from "svelte/store";
+import { EXPLORER, ASSETS } from "../constants";
 import { assetHashToCoin, getAssetData } from "../utils/asset";
 import type { Coin } from "../utils/types";
-import { allTradableAssets } from "./tdexstore";
 
 interface State {
   coins: Coin[]

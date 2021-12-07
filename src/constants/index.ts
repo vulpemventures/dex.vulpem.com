@@ -6,7 +6,7 @@ export const enum TradeButtonStatus {
   InvalidPair = "Pair not supported",
   ConnectWallet = "Connect wallet",
   ErrorPreview = "Preview not available",
-  NoUtxos = "need at least one utxo"
+  NoUtxos = "Need at least one utxo"
 }
 
 export const enum TradeStatus {

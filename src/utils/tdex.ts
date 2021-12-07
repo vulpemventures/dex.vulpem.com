@@ -149,19 +149,14 @@ export async function makeTrade(
   utxos: UtxoInterface[],
   explorerUrl: string
 ): Promise<string> {
-  try {
-    const trade = createTrade(order, utxos, explorerUrl);
-    const args: BuySellOpts = {
-      amount: known.sats,
-      asset: known.asset,
-      market: order.market,
-      identity
-    }
-    const promise = order.type === TradeType.BUY ? trade.buy(args) : trade.sell(args);
-    const txid = await promise;
-    return txid;
-  } catch (e) {
-    console.error(e);
-    throw new Error('error while making trade');
+  const trade = createTrade(order, utxos, explorerUrl);
+  const args: BuySellOpts = {
+    amount: known.sats,
+    asset: known.asset,
+    market: order.market,
+    identity
   }
+  const promise = order.type === TradeType.BUY ? trade.buy(args) : trade.sell(args);
+  const txid = await promise;
+  return txid;
 }

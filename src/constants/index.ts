@@ -5,7 +5,8 @@ export const enum TradeButtonStatus {
   EnterAmount = "Enter an amount",
   InvalidPair = "Pair not supported",
   ConnectWallet = "Connect wallet",
-  ErrorPreview = "Preview not available"
+  ErrorPreview = "Preview not available",
+  NoUtxos = "need at least one utxo"
 }
 
 export const enum TradeStatus {

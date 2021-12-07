@@ -21,7 +21,6 @@ export const tdexStore = readable<TdexStore>(initialTdexState, function(set: Sub
     const markets = await getMarketsForProviders(providers);
     set({ providers, markets });
   }
-  console.log('Fetching providers and markets...');
   fetchProvidersAndMarketsAndSet();
   setInterval(fetchProvidersAndMarketsAndSet, INTERVAL_FETCH_PROVIDERS);
 });

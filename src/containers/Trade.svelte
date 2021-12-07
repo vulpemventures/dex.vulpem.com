@@ -66,6 +66,8 @@
 
   $: tradeButton = !$marinaStore.enabled
     ? TradeButtonStatus.ConnectWallet
+    : $marinaStore.utxos.length === 0
+    ? TradeButtonStatus.NoUtxos
     : orders.length === 0
     ? TradeButtonStatus.InvalidPair
     : !isValidAmount(sendAmount) || !isValidAmount(receiveAmount)
@@ -131,9 +133,6 @@
     }
 
     try {
-      if (orders.length === 0) {
-        throw new Error('No orders available');
-      }
       const amountInSatoshis = toSatoshi(amount, fromCoin.precision);
       bestOrder = await discoverBestOrder(
         orders,

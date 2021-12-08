@@ -6,6 +6,6 @@ export function toSatoshi(val: string, precision = DEFAULT_PRECISION): Decimal {
   return new Decimal(val).mul(Decimal.pow(10, precision));
 }
 
-export function fromSatoshi(val: string, precision = DEFAULT_PRECISION): Decimal {
+export function fromSatoshi(val: number, precision = DEFAULT_PRECISION): Decimal {
   return new Decimal(val).div(Decimal.pow(10, precision));
 }

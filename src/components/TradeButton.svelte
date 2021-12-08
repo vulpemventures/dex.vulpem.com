@@ -11,11 +11,7 @@
   export let type: string;
   export let loading: boolean;
 
-  $: disabled =
-    type === TradeButtonStatus.EnterAmount ||
-    type === TradeButtonStatus.ConnectWallet ||
-    type === TradeButtonStatus.ErrorPreview ||
-    type === TradeButtonStatus.InvalidPair;
+  $: disabled = type !== TradeButtonStatus.Trade;
   $: tradeButtonMessage = type;
 </script>
 

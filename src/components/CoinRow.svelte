@@ -1,21 +1,27 @@
 <script>
-  import { Coin, CoinTicker } from '../constants';
+  import { LIQUID_BTC, LIQUID_CAD, LIQUID_USDT } from '../constants';
 
   import BitcoinLogo from '../assets/images/liquid-btc.svg';
   import TetherLogo from '../assets/images/liquid-tether.svg';
   import LCADLogo from '../assets/images/liquid-cad.png';
+  import QuestionMark from '../assets/images/question-mark.svg';
 
   const CoinLogo = {
-    [Coin.Bitcoin]: BitcoinLogo,
-    [Coin.Tether]: TetherLogo,
-    [Coin.LCAD]: LCADLogo,
+    [LIQUID_BTC]: BitcoinLogo,
+    [LIQUID_USDT]: TetherLogo,
+    [LIQUID_CAD]: LCADLogo,
   };
 
-  export let name;
+  const getImgSource = (coin) => {
+    const logo = CoinLogo[coin.assetHash];
+    if (!logo) return QuestionMark;
+    return logo;
+  };
+
+  export let coin;
   export let showTicker = false;
 
-  $: source = CoinLogo[name];
-  $: ticker = CoinTicker[name];
+  $: source = getImgSource(coin);
 </script>
 
 <div class="columns is-mobile is-vcentered">
@@ -25,6 +31,8 @@
     </figure>
   </div>
   <div class="column is-two-third">
-    <span class="subtitle has-text-white">{!showTicker ? name : ticker}</span>
+    <span class="subtitle has-text-white"
+      >{!showTicker ? coin.name : coin.ticker}</span
+    >
   </div>
 </div>

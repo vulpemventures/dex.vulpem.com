@@ -1,8 +1,7 @@
 <script>
   import Trade from './containers/Trade.svelte';
-  import Connect from './containers/Connect.svelte';
   import TdexIcon from './components/icons/TdexIcon.svelte';
-
+  import Connect from 'svelte-marina-button';
 </script>
 
 <section class="hero has-background-black-bis is-fullheight">

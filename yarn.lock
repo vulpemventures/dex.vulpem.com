@@ -4900,6 +4900,13 @@ svelte-loader@^3.0.0:
     svelte-dev-helper "^1.1.9"
     svelte-hmr "^0.14.2"
 
+svelte-marina-button@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/svelte-marina-button/-/svelte-marina-button-0.1.2.tgz#4bc778cb8e49d2b08534b1bbca39417c27f2228d"
+  integrity sha512-IkBc0qjyf9x+Jykvk72BrL/M2spV/aRHtT3QJDuX28K/1jQPWa4TgqcvBYJ7iYBHtK1vUlvCDtl3mSYSA4Bb1g==
+  dependencies:
+    marina-provider "^1.4.3"
+
 svelte-preprocess@^4.0.0, svelte-preprocess@^4.3.0:
   version "4.9.7"
   resolved "https://registry.yarnpkg.com/svelte-preprocess/-/svelte-preprocess-4.9.7.tgz#80610768e6094361cc20e29fc963f3f4f1c5b181"

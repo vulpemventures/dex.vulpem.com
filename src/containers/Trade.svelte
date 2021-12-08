@@ -1,9 +1,6 @@
 <script lang="ts">
   import { IdentityType, TradeOrder } from 'tdex-sdk';
-
-  import { marinaStore } from '../stores/store';
   import { coinStore } from '../stores/coinstore';
-
   import CoinRow from '../components/CoinRow.svelte';
   import ArrowDownIcon from '../components/icons/ArrowDownIcon.svelte';
   import TradeButton from '../components/TradeButton.svelte';
@@ -19,19 +16,21 @@
     LIQUID_USDT,
     EXPLORER,
   } from '../constants';
-
   import {
     calculateMarketPrice,
     computeOrders,
     discoverBestOrder,
     makeTrade,
   } from '../utils/tdex';
-
   import { fromSatoshi, toSatoshi } from '../utils/format';
   import BrowserInjectIdentity from '../utils/browserInject';
   import { isValidAmount } from '../utils/checks';
   import { Direction, Coin, CoinPair, coinPairToPair } from '../utils/types';
   import { allTradableAssets, tdexStore } from '../stores/tdexstore';
+  import { marinaStore } from 'svelte-marina-button';
+  import { utxoStore } from '../stores/utxostore';
+
+  utxoStore.subscribe(() => null); // trigger utxo update
 
   let activeInputDirection: Direction = 'send';
   let pair: CoinPair = {
@@ -66,7 +65,7 @@
 
   $: tradeButton = !$marinaStore.enabled
     ? TradeButtonStatus.ConnectWallet
-    : $marinaStore.utxos.length === 0
+    : $utxoStore.unspents.length === 0
     ? TradeButtonStatus.NoUtxos
     : orders.length === 0
     ? TradeButtonStatus.InvalidPair
@@ -200,7 +199,7 @@
           asset: pair.send.assetHash,
         },
         bestOrder,
-        $marinaStore.utxos,
+        $utxoStore.unspents,
         EXPLORER
       );
 

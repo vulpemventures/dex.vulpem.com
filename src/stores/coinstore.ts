@@ -14,7 +14,7 @@ export type CoinStore = Readable<State> & {
 
 function createCoinStore(initialCoins: Coin[]): CoinStore {
   let state: State = { coins: initialCoins };
-  const { subscribe, set, update } = writable<State>(state);
+  const { subscribe, update } = writable<State>(state);
 
   subscribe((v) => state = v);
 
@@ -26,7 +26,7 @@ function createCoinStore(initialCoins: Coin[]): CoinStore {
         if (!state.coins.find(c => c.assetHash === asset)) {
           const newCoin = await getAssetData(asset, EXPLORER);
           update((s) => {
-            s.coins.push(newCoin);
+            s.coins = [...s.coins, newCoin];
             return s;
           });
         }

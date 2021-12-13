@@ -2,6 +2,7 @@
   import { TradeStatus } from '../constants';
   import SuccessIcon from './icons/SuccessIcon.svelte';
   import ErrorIcon from './icons/ErrorIcon.svelte';
+  import type { Coin } from '../utils/types';
 
   export let active: boolean;
 
@@ -9,10 +10,10 @@
   export let txid: string;
   export let error: string;
 
-  export let sendAmount;
-  export let receiveAmount;
-  export let sendCoin;
-  export let receiveCoin;
+  export let sendAmount: string;
+  export let receiveAmount: string;
+  export let sendCoin: Coin;
+  export let receiveCoin: Coin;
 
   const onCancel = () => {
     active = false;
@@ -32,8 +33,8 @@
             <h1 class="title has-text-white">Waiting for Confirmation...</h1>
             <p class="subtitle">
               Swapping {sendAmount}
-              {sendCoin} for {receiveAmount}
-              {receiveCoin}
+              {sendCoin.name} for {receiveAmount}
+              {receiveCoin.name}
             </p>
             <p class="subtitle is-6 has-text-weight-light has-text-grey">
               Confirm this transaction in your Marina wallet

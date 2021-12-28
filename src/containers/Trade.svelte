@@ -29,6 +29,7 @@
   import { allTradableAssets, tdexStore } from '../stores/tdexstore';
   import { marinaStore } from 'svelte-marina-button';
   import { utxoStore } from '../stores/utxostore';
+  import LoadingModal from '../components/LoadingModal.svelte';
 
   utxoStore.subscribe(() => null); // trigger utxo update
 
@@ -302,6 +303,7 @@
   {receiveAmount}
   receiveCoin={pair.receive}
 />
+<LoadingModal />
 
 <style>
   .coin-button {

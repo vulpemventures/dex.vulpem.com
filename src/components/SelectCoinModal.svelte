@@ -22,7 +22,7 @@
   enum MESSAGES {
     loading = 'Discovering TDEX providers...',
     timeout = 'All TDEX providers are not available. Try again later',
-  };
+  }
   let message = MESSAGES.loading;
   const timeoutDelay = 60 * 1000; // 60 seconds
   setTimeout(() => (message = MESSAGES.timeout), timeoutDelay);

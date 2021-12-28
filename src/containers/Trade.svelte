@@ -305,6 +305,7 @@
 
 <style>
   .coin-button {
+    box-shadow: none !important;
     width: 140px;
   }
 </style>

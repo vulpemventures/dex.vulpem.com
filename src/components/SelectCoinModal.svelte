@@ -20,7 +20,7 @@
   // Show a loading message while we wait for tdex markets
   // After a timeout delay, show a different message
   const messages = {
-    loading: 'Loading...',
+    loading: 'Discovering TDEX providers...',
     timeout: 'Something went wrong.',
   };
   let message = messages.loading;

@@ -19,13 +19,13 @@
 
   // Show a loading message while we wait for tdex markets
   // After a timeout delay, show a different message
-  const messages = {
-    loading: 'Discovering TDEX providers...',
-    timeout: 'All TDEX providers are not available. Try again later',
+  enum MESSAGES {
+    loading = 'Discovering TDEX providers...',
+    timeout = 'All TDEX providers are not available. Try again later',
   };
-  let message = messages.loading;
+  let message = MESSAGES.loading;
   const timeoutDelay = 60 * 1000; // 60 seconds
-  setTimeout(() => (message = messages.timeout), timeoutDelay);
+  setTimeout(() => (message = MESSAGES.timeout), timeoutDelay);
   $: message;
 </script>
 

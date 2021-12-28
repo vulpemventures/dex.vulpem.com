@@ -21,7 +21,7 @@
   // After a timeout delay, show a different message
   const messages = {
     loading: 'Discovering TDEX providers...',
-    timeout: 'Something went wrong.',
+    timeout: 'All TDEX providers are not available. Try again later',
   };
   let message = messages.loading;
   const timeoutDelay = 60 * 1000; // 60 seconds

@@ -22,10 +22,10 @@
   const messages = {
     loading: 'Loading...',
     timeout: 'Something went wrong.',
-  }
+  };
   let message = messages.loading;
   const timeoutDelay = 60 * 1000; // 60 seconds
-  setTimeout(() => message = messages.timeout, timeoutDelay);
+  setTimeout(() => (message = messages.timeout), timeoutDelay);
   $: message;
 </script>
 

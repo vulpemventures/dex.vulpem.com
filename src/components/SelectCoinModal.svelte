@@ -16,6 +16,17 @@
     dispatch('selected', { coin });
     active = false;
   };
+
+  // Show a loading message while we wait for tdex markets
+  // After a timeout delay, show a different message
+  const messages = {
+    loading: 'Loading...',
+    timeout: 'Something went wrong.',
+  }
+  let message = messages.loading;
+  const timeoutDelay = 60 * 1000; // 60 seconds
+  setTimeout(() => message = messages.timeout, timeoutDelay);
+  $: message;
 </script>
 
 <div class="modal {active && 'is-active'}">
@@ -24,16 +35,20 @@
     <div class="columns">
       <div class="column is-half is-offset-one-quarter">
         <h1 class="title has-text-white">Select an asset</h1>
-        <ul class="mt-6">
-          {#each tradableCoins as coin}
-            <li class="mt-3">
-              <!-- svelte-ignore a11y-missing-attribute -->
-              <a on:click={() => onSelect(coin)}>
-                <CoinRow {coin} />
-              </a>
-            </li>
-          {/each}
-        </ul>
+        {#if tradableCoins.length > 0}
+          <ul class="mt-6">
+            {#each tradableCoins as coin}
+              <li class="mt-3">
+                <!-- svelte-ignore a11y-missing-attribute -->
+                <a on:click={() => onSelect(coin)}>
+                  <CoinRow {coin} />
+                </a>
+              </li>
+            {/each}
+          </ul>
+        {:else}
+          <p class="has-text-white">{message}</p>
+        {/if}
       </div>
     </div>
   </div>

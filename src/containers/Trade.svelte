@@ -29,6 +29,7 @@
   import { allTradableAssets, tdexStore } from '../stores/tdexstore';
   import { marinaStore } from 'svelte-marina-button';
   import { utxoStore } from '../stores/utxostore';
+  import { showToast } from '../utils/toast';
 
   utxoStore.subscribe(() => null); // trigger utxo update
 
@@ -152,13 +153,15 @@
       coinsRatio = parseFloat(
         (toSatoshis.toNumber() / amount).toFixed(fromCoin.precision)
       );
+
       if (which === 'send') {
         receiveAmount = toSatoshis.toString();
       } else {
         sendAmount = toSatoshis.toString();
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       tradeButton = TradeButtonStatus.ErrorPreview;
+      showToast(err);
       console.error(err);
     } finally {
       loading = false;

@@ -26,14 +26,22 @@ export const utxoStore = readable<UtxoStore>(initialState, function (set) {
 
   // trick to update the store using updaters + set
   const updateState = (updater: Updater<UtxoStore>) => {
-    console.log('updating state')
     const newState = updater(state);
     state = newState;
+    console.log('updating state to', state);
     set(state);
   }
 
   detectProvider('marina')
     .then((marina: MarinaProvider) => {
+      marina.getNetwork().then(console.log);
+      // load initial utxo set via getCoins Marina API
+      marina.getCoins()
+        .then((utxos: Utxo[]) => {
+          utxos?.forEach((u: Utxo) => updateState(addUtxo(u)));
+        })
+        .catch(console.error);
+      // push new_utxo and spent_utxo events to listeners
       const newUtxoListID = marina.on('NEW_UTXO', (u: Utxo) => updateState(addUtxo(u)));
       const spentUtxoListID = marina.on('SPENT_UTXO', (outpoint: Outpoint) => updateState(removeUtxo(outpoint)));
       listeners.push(newUtxoListID, spentUtxoListID);

@@ -34,7 +34,6 @@ export const utxoStore = readable<UtxoStore>(initialState, function (set) {
 
   detectProvider('marina')
     .then((marina: MarinaProvider) => {
-      marina.getNetwork().then(console.log);
       // load initial utxo set via getCoins Marina API
       marina.getCoins()
         .then((utxos: Utxo[]) => {

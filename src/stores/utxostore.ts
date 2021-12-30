@@ -28,7 +28,7 @@ export const utxoStore = readable<UtxoStore>(initialState, function (set) {
   const updateState = (updater: Updater<UtxoStore>) => {
     const newState = updater(state);
     state = newState;
-    console.log('updating state to', state);
+    console.debug('updating state to', state);
     set(state);
   }
 

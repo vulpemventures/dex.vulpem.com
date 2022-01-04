@@ -75,9 +75,6 @@ export function computeOrders(
   const orders: TradeOrder[] = [];
   for (const [providerEndpoint, markets] of Object.entries(marketsByProvider)) {
     orders.push(...tdexOrdersForProvider(pair, providerEndpoint, markets));
-    if (orders.length > 0) {
-      return orders;
-    }
   }
 
   return orders;

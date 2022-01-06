@@ -113,4 +113,22 @@ export const ASSETS: Coin[] = [
     precision: PRECISION,
     ticker: AssetTickers.BTSE,
   },
+  {
+    assetHash: AssetHashes[AssetNames.LBTC][NetworkNames.TESTNET],
+    name: AssetNames.LBTC,
+    precision: PRECISION,
+    ticker: AssetTickers.LBTC,
+  },
+  {
+    assetHash: AssetHashes[AssetNames.USDT][NetworkNames.TESTNET],
+    name: AssetNames.USDT,
+    precision: PRECISION,
+    ticker: AssetTickers.USDT,
+  },
+  {
+    assetHash: AssetHashes[AssetNames.LCAD][NetworkNames.TESTNET],
+    name: AssetNames.LCAD,
+    precision: PRECISION,
+    ticker: AssetTickers.LCAD,
+  },
 ];

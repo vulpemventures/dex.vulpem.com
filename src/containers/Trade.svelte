@@ -306,6 +306,7 @@
     </div>
   </div>
 </form>
+<p class="is-size-7 has-text-right">{$marinaStore.network} network</p>
 <SelectCoinModal
   {tradableCoins}
   bind:active={showCoinModal}

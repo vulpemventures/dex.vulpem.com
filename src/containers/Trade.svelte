@@ -136,20 +136,18 @@
     const fromCoin = which === 'send' ? pair.send : pair.receive;
     const toCoin = which === 'send' ? pair.receive : pair.send;
 
-    if (!isValidAmount(amount)) return;
-
-    loading = true;
-
+    // reset other amount if this in null or undefined
     if (!amount) {
-      if (which === 'send') {
-        receiveAmount = undefined;
-      } else {
-        sendAmount = undefined;
-      }
-
-      loading = false;
+      if (which === 'send') receiveAmount = undefined;
+      else sendAmount = undefined;
       return; // skip if undefined
     }
+
+    // return if invalid amount or no orders available
+    if (!isValidAmount(amount)) return;
+    if (orders.length === 0) return;
+
+    loading = true;
 
     try {
       const amountInSatoshis = toSatoshi(amount, fromCoin.precision);

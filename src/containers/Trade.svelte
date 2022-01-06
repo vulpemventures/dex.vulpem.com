@@ -12,9 +12,10 @@
     Fiat,
     TradeButtonStatus,
     TradeStatus,
-    LIQUID_BTC,
-    LIQUID_USDT,
     EXPLORER,
+    AssetHashes,
+    AssetNames,
+    NetworkNames,
   } from '../constants';
   import {
     calculateMarketPrice,
@@ -35,10 +36,25 @@
   utxoStore.subscribe(() => null); // trigger utxo update
 
   let activeInputDirection: Direction = 'send';
-  let pair: CoinPair = {
-    send: coinStore.getCoin(LIQUID_BTC),
-    receive: coinStore.getCoin(LIQUID_USDT),
-  };
+
+  /**
+   * default trade pair is LBTC / USDT for a given network
+   * @param network network name to get asset hash for
+   * @returns CoinPair, the pair of coins
+   */
+  function defaultPair(network: string): CoinPair {
+    const lbtc = AssetHashes[AssetNames.LBTC];
+    const usdt = AssetHashes[AssetNames.USDT];
+    const lbtcHash = lbtc[network] || lbtc[NetworkNames.MAINNET];
+    const usdtHash = usdt[network] || usdt[NetworkNames.MAINNET];
+    return {
+      send: coinStore.getCoin(lbtcHash),
+      receive: coinStore.getCoin(usdtHash)
+    }
+  }
+
+  $: pair = defaultPair($marinaStore.network);
+
   $: orders = computeOrders(coinPairToPair(pair), $tdexStore.markets);
 
   let bestOrder: TradeOrder = undefined;

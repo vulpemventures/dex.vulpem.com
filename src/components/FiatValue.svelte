@@ -1,7 +1,8 @@
 <script lang="ts">
   import { isValidAmount } from '../utils/checks';
-  import { CoinGeckoId, Fiat, FiatSymbol } from '../constants';
+  import { CoinGeckoId, Fiat, FiatSymbol, NetworkNames } from '../constants';
   import type { Coin } from '../utils/types';
+  import { marinaStore } from 'svelte-marina-button';
 
   export let coin: Coin;
   export let amount: number;
@@ -33,7 +34,7 @@
   $: id = CoinGeckoId[coin.assetHash];
   $: currency = CoinGeckoId[fiat];
   $: promise = getValue(id, amount, currency);
-  $: visible = amount && id;
+  $: visible = $marinaStore.network === NetworkNames.MAINNET && amount && id;
 </script>
 
 {#if visible}

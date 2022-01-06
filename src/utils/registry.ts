@@ -3,7 +3,7 @@ import { detectProvider, MarinaProvider } from 'marina-provider';
 
 const Registries = {
   [NetworkNames.MAINNET]: 'https://raw.githubusercontent.com/TDex-network/tdex-registry/master/registry.json',
-  [NetworkNames.TESTNET]: 'https://raw.githubusercontent.com/TDex-network/tdex-registry/master/registry.json', // TODO
+  [NetworkNames.TESTNET]: 'https://joaobordalo.com/labs/tdex-registry/registry.json', // TODO: change this
 }
 
 /**

@@ -43,31 +43,31 @@ export const CoinGeckoId: Record<string,string> = {
   [Fiat.USD]: "usd",
 };
 
-// ASSETS is an array of "featured assets" 
+// ASSETS is an array of "featured assets"
 // (i.e assets data harcoded in the app, it lets to save some network requests for very common assets)
 export const ASSETS: Coin[] = [
   {
-    name: "Liquid bitcoin",
-    ticker: "L-BTC",
     assetHash: LIQUID_BTC,
+    name: "Liquid bitcoin",
     precision: 8,
+    ticker: "L-BTC",
   },
   {
-    ticker: 'USDT',
     assetHash: LIQUID_USDT,
-    precision: 8,
     name: 'Tether USD',
+    precision: 8,
+    ticker: 'USDT',
   },
   {
-    ticker: 'LCAD',
     assetHash: LIQUID_CAD,
-    precision: 8,
     name: 'Liquid CAD',
+    precision: 8,
+    ticker: 'LCAD',
   },
   {
-    ticker: 'BTSE',
     assetHash: 'b00b0ff0b11ebd47f7c6f57614c046dbbd204e84bf01178baf2be3713a206eb7',
-    precision: 8,
     name: 'BTSE Token',
+    precision: 8,
+    ticker: 'BTSE',
   },
 ];

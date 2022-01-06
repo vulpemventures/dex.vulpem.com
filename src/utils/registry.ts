@@ -12,8 +12,9 @@ const Registries = {
  */
 export async function getRegistryURL(): Promise<string> {
   const network = await detectProvider('marina')
-    .then((marina: MarinaProvider) => {
-      return marina.getNetwork().then((network) => network || NetworkNames.MAINNET );
+    .then(async (marina: MarinaProvider): Promise<string> => {
+      const network = await marina.getNetwork();
+      return network || NetworkNames.MAINNET;
     })
     .catch((err) => {
       console.error(err);

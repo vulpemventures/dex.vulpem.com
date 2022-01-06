@@ -12,7 +12,6 @@
     Fiat,
     TradeButtonStatus,
     TradeStatus,
-    EXPLORER,
     AssetHashes,
     AssetNames,
     NetworkNames,
@@ -32,6 +31,7 @@
   import { utxoStore } from '../stores/utxostore';
   import { showToast } from '../utils/toast';
   import LoadingModal from '../components/LoadingModal.svelte';
+  import { getExplorerForNetwork } from '../utils/explorer';
 
   utxoStore.subscribe(() => null); // trigger utxo update
 
@@ -54,6 +54,8 @@
   }
 
   $: pair = defaultPair($marinaStore.network);
+
+  $: explorer = getExplorerForNetwork($marinaStore.network);
 
   $: orders = computeOrders(coinPairToPair(pair), $tdexStore.markets);
 
@@ -220,7 +222,7 @@
         },
         bestOrder,
         $utxoStore.unspents,
-        EXPLORER
+        explorer,
       );
 
       tradeStatus = TradeStatus.COMPLETED;

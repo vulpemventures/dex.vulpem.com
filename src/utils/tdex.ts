@@ -1,6 +1,7 @@
 import { bestBalanceDiscovery, bestPriceDiscovery, BuySellOpts, CoinSelector, combineDiscovery, Discoverer, greedyCoinSelector, IdentityInterface, MarketInterface, Trade, TradeOrder, TraderClient, TradeType, UtxoInterface } from "tdex-sdk";
 import axios from "axios";
 import { isTDEXProvider, TDEXProvider, Pair } from "./types";
+import { getRegistryURL } from "./registry";
 
 function tdexOrdersForProvider(pair: Pair, providerEndpoint: string, markets: MarketInterface[], torProxy?: string) {
   const orders: TradeOrder[] = [];
@@ -27,14 +28,12 @@ function tdexOrdersForProvider(pair: Pair, providerEndpoint: string, markets: Ma
   return orders;
 }
 
-const TDEX_REGISTRY_URL = 'https://raw.githubusercontent.com/TDex-network/tdex-registry/master/registry.json';
-
 /**
  * Get a list of registered providers from TDEX_REGISTRY_URL
  * @returns a list of providers
  */
 export async function getProvidersFromRegistry(): Promise<TDEXProvider[]> {
-  const res = (await axios.get(TDEX_REGISTRY_URL)).data
+  const res = (await axios.get(await getRegistryURL())).data
   if (!Array.isArray(res)) throw new Error('Invalid registry response')
   return res.filter(isTDEXProvider)
 }

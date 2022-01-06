@@ -49,8 +49,8 @@
     const usdtHash = usdt[network] || usdt[NetworkNames.MAINNET];
     return {
       send: coinStore.getCoin(lbtcHash),
-      receive: coinStore.getCoin(usdtHash)
-    }
+      receive: coinStore.getCoin(usdtHash),
+    };
   }
 
   $: pair = defaultPair($marinaStore.network);
@@ -167,9 +167,11 @@
 
       const toSatoshis = fromSatoshi(toAmount, toCoin.precision);
 
-      coinsRatio = parseFloat(
-        (toSatoshis.toNumber() / amount).toFixed(fromCoin.precision)
-      );
+      coinsRatio =
+        $marinaStore.network === NetworkNames.MAINNET &&
+        parseFloat(
+          (toSatoshis.toNumber() / amount).toFixed(fromCoin.precision)
+        );
 
       if (which === 'send') {
         receiveAmount = toSatoshis.toString();
@@ -220,7 +222,7 @@
         },
         bestOrder,
         $utxoStore.unspents,
-        explorer,
+        explorer
       );
 
       tradeStatus = TradeStatus.COMPLETED;

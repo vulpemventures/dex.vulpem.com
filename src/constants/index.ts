@@ -50,30 +50,37 @@ export const enum NetworkNames {
   TESTNET = 'testnet',
 }
 
+export const enum AssetNames {
+  BTSE = 'BTSE Token',
+  LBTC = 'Liquid bitcoin',
+  LCAD = 'Liquid CAD',
+  USDT = 'Tether USD',
+}
+
 // ASSETS is an array of "featured assets"
 // (i.e assets data harcoded in the app, it lets to save some network requests for very common assets)
 export const ASSETS: Coin[] = [
   {
     assetHash: LIQUID_BTC,
-    name: "Liquid bitcoin",
+    name: AssetNames.LBTC,
     precision: PRECISION,
     ticker: "L-BTC",
   },
   {
     assetHash: LIQUID_USDT,
-    name: 'Tether USD',
+    name: AssetNames.USDT,
     precision: PRECISION,
     ticker: 'USDT',
   },
   {
     assetHash: LIQUID_CAD,
-    name: 'Liquid CAD',
+    name: AssetNames.LCAD,
     precision: PRECISION,
     ticker: 'LCAD',
   },
   {
     assetHash: 'b00b0ff0b11ebd47f7c6f57614c046dbbd204e84bf01178baf2be3713a206eb7',
-    name: 'BTSE Token',
+    name: AssetNames.BTSE,
     precision: PRECISION,
     ticker: 'BTSE',
   },

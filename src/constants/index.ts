@@ -33,6 +33,8 @@ export const LIQUID_CAD = '0e99c1a6da379d1f4151fb9df90449d40d0608f6cb33a5bcbfc8c
 
 export const EXPLORER = 'https://blockstream.info/liquid/api'
 
+const PRECISION = 8;
+
 // used on FiatValue component
 export const CoinGeckoId: Record<string,string> = {
   [LIQUID_BTC]: "bitcoin",
@@ -49,25 +51,25 @@ export const ASSETS: Coin[] = [
   {
     assetHash: LIQUID_BTC,
     name: "Liquid bitcoin",
-    precision: 8,
+    precision: PRECISION,
     ticker: "L-BTC",
   },
   {
     assetHash: LIQUID_USDT,
     name: 'Tether USD',
-    precision: 8,
+    precision: PRECISION,
     ticker: 'USDT',
   },
   {
     assetHash: LIQUID_CAD,
     name: 'Liquid CAD',
-    precision: 8,
+    precision: PRECISION,
     ticker: 'LCAD',
   },
   {
     assetHash: 'b00b0ff0b11ebd47f7c6f57614c046dbbd204e84bf01178baf2be3713a206eb7',
     name: 'BTSE Token',
-    precision: 8,
+    precision: PRECISION,
     ticker: 'BTSE',
   },
 ];

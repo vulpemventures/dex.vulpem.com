@@ -35,16 +35,6 @@ export const EXPLORER = 'https://blockstream.info/liquid/api'
 
 const PRECISION = 8;
 
-// used on FiatValue component
-export const CoinGeckoId: Record<string,string> = {
-  [LIQUID_BTC]: "bitcoin",
-  [LIQUID_USDT]: "tether",
-  [LIQUID_CAD]: "cad",
-  [Fiat.CAD]: "cad",
-  [Fiat.EUR]: "eur",
-  [Fiat.USD]: "usd",
-};
-
 export const enum NetworkNames {
   MAINNET = 'liquid',
   TESTNET = 'testnet',
@@ -85,6 +75,16 @@ export const AssetHashes: Record<string, IAssetHash> = {
     [NetworkNames.TESTNET]: 'f3d1ec678811398cd2ae277cbe3849c6f6dbd72c74bc542f7c4b11ff0e820958',
   },
 }
+
+// used on FiatValue component
+export const CoinGeckoId: Record<string,string> = {
+  [AssetHashes[AssetNames.LBTC][NetworkNames.MAINNET]]: "bitcoin",
+  [AssetHashes[AssetNames.USDT][NetworkNames.MAINNET]]: "tether",
+  [AssetHashes[AssetNames.LCAD][NetworkNames.MAINNET]]: "cad",
+  [Fiat.CAD]: "cad",
+  [Fiat.EUR]: "eur",
+  [Fiat.USD]: "usd",
+};
 
 // ASSETS is an array of "featured assets"
 // (i.e assets data harcoded in the app, it lets to save some network requests for very common assets)

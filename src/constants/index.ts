@@ -57,6 +57,13 @@ export const enum AssetNames {
   USDT = 'Tether USD',
 }
 
+export const enum AssetTickers {
+  BTSE = 'BTSE',
+  LBTC = 'L-BTC',
+  LCAD = 'LCAD',
+  USDT = 'USDT',
+}
+
 // ASSETS is an array of "featured assets"
 // (i.e assets data harcoded in the app, it lets to save some network requests for very common assets)
 export const ASSETS: Coin[] = [
@@ -64,24 +71,24 @@ export const ASSETS: Coin[] = [
     assetHash: LIQUID_BTC,
     name: AssetNames.LBTC,
     precision: PRECISION,
-    ticker: "L-BTC",
+    ticker: AssetTickers.LBTC,
   },
   {
     assetHash: LIQUID_USDT,
     name: AssetNames.USDT,
     precision: PRECISION,
-    ticker: 'USDT',
+    ticker: AssetTickers.USDT,
   },
   {
     assetHash: LIQUID_CAD,
     name: AssetNames.LCAD,
     precision: PRECISION,
-    ticker: 'LCAD',
+    ticker: AssetTickers.LCAD,
   },
   {
     assetHash: 'b00b0ff0b11ebd47f7c6f57614c046dbbd204e84bf01178baf2be3713a206eb7',
     name: AssetNames.BTSE,
     precision: PRECISION,
-    ticker: 'BTSE',
+    ticker: AssetTickers.BTSE,
   },
 ];

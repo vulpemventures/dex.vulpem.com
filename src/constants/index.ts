@@ -45,6 +45,11 @@ export const CoinGeckoId: Record<string,string> = {
   [Fiat.USD]: "usd",
 };
 
+export const enum NetworkNames {
+  MAINNET = 'liquid',
+  TESTNET = 'testnet',
+}
+
 // ASSETS is an array of "featured assets"
 // (i.e assets data harcoded in the app, it lets to save some network requests for very common assets)
 export const ASSETS: Coin[] = [

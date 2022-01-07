@@ -2,6 +2,7 @@ import { derived, readable, Subscriber } from "svelte/store";
 import type { MarketInterface } from "tdex-sdk";
 import { getProvidersFromRegistry, getMarketsForProviders } from "../utils/tdex";
 import type { TDEXProvider } from "../utils/types";
+import { detectProvider, EventListenerID, MarinaProvider } from "marina-provider";
 
 export interface TdexStore {
   providers: TDEXProvider[];
@@ -16,6 +17,7 @@ const initialTdexState: TdexStore = {
 };
 
 export const tdexStore = readable<TdexStore>(initialTdexState, function(set: Subscriber<TdexStore>) {
+  const listeners: EventListenerID[] = [];
   const fetchProvidersAndMarketsAndSet = async () => {
     const providers = await getProvidersFromRegistry();
     const markets = await getMarketsForProviders(providers);
@@ -23,6 +25,12 @@ export const tdexStore = readable<TdexStore>(initialTdexState, function(set: Sub
   }
   fetchProvidersAndMarketsAndSet();
   setInterval(fetchProvidersAndMarketsAndSet, INTERVAL_FETCH_PROVIDERS);
+  detectProvider('marina')
+    .then((marina: MarinaProvider) => {
+      const networkChange = marina.on('NETWORK', () => fetchProvidersAndMarketsAndSet());
+      listeners.push(networkChange);
+    })
+    .catch(console.error);
 });
 
 function assetHashFromMarkets(markets: MarketInterface[]): string[] {

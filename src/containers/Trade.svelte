@@ -265,7 +265,12 @@
       />
       <!-- svelte-ignore a11y-missing-attribute -->
       <a on:click={() => onFiatClick()}>
-        <FiatValue coin={pair.send} amount={sendAmount} fiat={fiatCoin} />
+        <FiatValue
+          coin={pair.send}
+          amount={sendAmount}
+          fiat={fiatCoin}
+          network={$marinaStore.network}
+        />
       </a>
     </div>
   </div>
@@ -297,7 +302,12 @@
       />
       <!-- svelte-ignore a11y-missing-attribute -->
       <a on:click={() => onFiatClick()}>
-        <FiatValue coin={pair.receive} amount={receiveAmount} fiat={fiatCoin} />
+        <FiatValue
+          coin={pair.receive}
+          amount={receiveAmount}
+          fiat={fiatCoin}
+          network={$marinaStore.network}
+        />
       </a>
     </div>
   </div>

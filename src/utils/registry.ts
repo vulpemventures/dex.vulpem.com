@@ -2,8 +2,8 @@ import { NetworkNames } from '../constants';
 import { detectProvider, MarinaProvider } from 'marina-provider';
 
 const Registries = {
-  [NetworkNames.MAINNET]: 'https://raw.githubusercontent.com/TDex-network/tdex-registry/master/registry.json',
-  [NetworkNames.TESTNET]: 'https://joaobordalo.com/labs/tdex-registry/registry.json', // TODO: change this
+  [NetworkNames.MAINNET]: 'https://raw.githubusercontent.com/tdex-network/tdex-registry/master/registry.json',
+  [NetworkNames.TESTNET]: 'https://raw.githubusercontent.com/tdex-network/tdex-registry/testnet/registry.json',
 }
 
 /**

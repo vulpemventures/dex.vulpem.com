@@ -27,12 +27,6 @@ export const FiatSymbol: Record<Fiat, string> = {
   [Fiat.USD]: "$"
 };
 
-export const LIQUID_BTC = '6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d';
-export const LIQUID_USDT = 'ce091c998b83c78bb71a632313ba3760f1763d9cfcffae02258ffa9865a37bd2';
-export const LIQUID_CAD = '0e99c1a6da379d1f4151fb9df90449d40d0608f6cb33a5bcbfc8c265f42bab0a';
-
-export const EXPLORER = 'https://blockstream.info/liquid/api'
-
 const PRECISION = 8;
 
 export const enum NetworkNames {

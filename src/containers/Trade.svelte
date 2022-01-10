@@ -62,7 +62,7 @@
   let bestOrder: TradeOrder = undefined;
 
   allTradableAssets.subscribe((assets) => {
-    coinStore.updateWithAssets(assets);
+    coinStore.updateWithAssets(assets, explorer);
   });
 
   $: tradableCoins = $allTradableAssets.map((a) => coinStore.getCoin(a));

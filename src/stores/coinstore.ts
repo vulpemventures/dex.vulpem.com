@@ -1,7 +1,6 @@
 import { Readable, writable } from "svelte/store";
 import { ASSETS } from "../constants";
 import { assetHashToCoin, getAssetData } from "../utils/asset";
-import { getExplorer } from "../utils/explorer";
 import type { Coin } from "../utils/types";
 
 interface State {
@@ -9,7 +8,7 @@ interface State {
 }
 
 export type CoinStore = Readable<State> & {
-  updateWithAssets(assets: string[]): Promise<void>
+  updateWithAssets(assets: string[], explorer: string): Promise<void>
   getCoin(assetHash: string): Coin
 }
 
@@ -22,11 +21,9 @@ function createCoinStore(initialCoins: Coin[]): CoinStore {
   return {
     subscribe,
     getCoin: (assetHash: string) => state.coins.find(c => c.assetHash === assetHash) || assetHashToCoin(assetHash),
-    updateWithAssets: async (assets: string[]) => {
-      let explorer;
+    updateWithAssets: async (assets: string[], explorer: string) => {
       for (const asset of assets) {
         if (!state.coins.find(c => c.assetHash === asset)) {
-          explorer ||= await getExplorer();
           const newCoin = await getAssetData(asset, explorer);
           update((s) => {
             s.coins = [...s.coins, newCoin];

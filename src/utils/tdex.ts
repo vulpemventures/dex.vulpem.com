@@ -2,6 +2,7 @@ import { bestBalanceDiscovery, bestPriceDiscovery, BuySellOpts, CoinSelector, co
 import axios from "axios";
 import { isTDEXProvider, TDEXProvider, Pair } from "./types";
 import { getRegistryURL } from "./registry";
+import { NetworkNames } from "../constants";
 
 function tdexOrdersForProvider(pair: Pair, providerEndpoint: string, markets: MarketInterface[], torProxy?: string) {
   const orders: TradeOrder[] = [];
@@ -32,8 +33,8 @@ function tdexOrdersForProvider(pair: Pair, providerEndpoint: string, markets: Ma
  * Get a list of registered providers from TDEX_REGISTRY_URL
  * @returns a list of providers
  */
-export async function getProvidersFromRegistry(): Promise<TDEXProvider[]> {
-  const res = (await axios.get(await getRegistryURL())).data
+export async function getProvidersFromRegistry(network: string = NetworkNames.MAINNET): Promise<TDEXProvider[]> {
+  const res = (await axios.get(getRegistryURL(network))).data
   if (!Array.isArray(res)) throw new Error('Invalid registry response')
   return res.filter(isTDEXProvider)
 }

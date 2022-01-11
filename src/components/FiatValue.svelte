@@ -1,11 +1,12 @@
 <script lang="ts">
   import { isValidAmount } from '../utils/checks';
-  import { CoinGeckoId, Fiat, FiatSymbol } from '../constants';
+  import { CoinGeckoId, Fiat, FiatSymbol, NetworkNames } from '../constants';
   import type { Coin } from '../utils/types';
 
   export let coin: Coin;
   export let amount: number;
   export let fiat: Fiat;
+  export let network: string;
 
   async function getValue(
     id: string | undefined,
@@ -33,7 +34,7 @@
   $: id = CoinGeckoId[coin.assetHash];
   $: currency = CoinGeckoId[fiat];
   $: promise = getValue(id, amount, currency);
-  $: visible = amount && id;
+  $: visible = network === NetworkNames.MAINNET && amount && id;
 </script>
 
 {#if visible}

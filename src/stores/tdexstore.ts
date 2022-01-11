@@ -2,6 +2,8 @@ import { derived, readable, Subscriber } from "svelte/store";
 import type { MarketInterface } from "tdex-sdk";
 import { getProvidersFromRegistry, getMarketsForProviders } from "../utils/tdex";
 import type { TDEXProvider } from "../utils/types";
+import { detectProvider, EventListenerID, MarinaProvider } from "marina-provider";
+import { NetworkNames } from "../constants";
 
 export interface TdexStore {
   providers: TDEXProvider[];
@@ -16,13 +18,45 @@ const initialTdexState: TdexStore = {
 };
 
 export const tdexStore = readable<TdexStore>(initialTdexState, function(set: Subscriber<TdexStore>) {
-  const fetchProvidersAndMarketsAndSet = async () => {
-    const providers = await getProvidersFromRegistry();
+  let intervalHandler: NodeJS.Timeout, networkChangeListenerID: string;
+  const listeners: EventListenerID[] = [];
+
+  /**
+   * Fetch available providers from registry url
+   * Fetch markets from each provider
+   * @param network  the name of the network choosen by the user
+   */
+  const fetchProvidersAndMarketsAndSet = async (network: string = NetworkNames.MAINNET) => {
+    const providers = await getProvidersFromRegistry(network);
     const markets = await getMarketsForProviders(providers);
     set({ providers, markets });
   }
-  fetchProvidersAndMarketsAndSet();
-  setInterval(fetchProvidersAndMarketsAndSet, INTERVAL_FETCH_PROVIDERS);
+
+  /**
+   * After network change (and also for the first time):
+   * - fetch providers and markets for network
+   * - create new interval (of one hour) to refresh providers and markets
+   * - create new event listener for when there's a network change
+   * @param marina the marina extension provider, needed to deal with event listeners
+   * @param network the name of the network choosen by the user
+   */
+  const afterNetworkChange = (marina: MarinaProvider, network: string = NetworkNames.MAINNET) => {
+    // fetch providers and markets for network
+    fetchProvidersAndMarketsAndSet(network);
+
+    // create new interval (of one hour) to refresh providers and markets
+    if (intervalHandler) clearInterval(intervalHandler);
+    intervalHandler = setInterval(() => fetchProvidersAndMarketsAndSet(network), INTERVAL_FETCH_PROVIDERS);
+
+    // create new event listener for when there's a network change
+    if (networkChangeListenerID) marina.off(networkChangeListenerID);
+    networkChangeListenerID = marina.on('NETWORK', (network) => afterNetworkChange(marina, network));
+    listeners.push(networkChangeListenerID);
+  }
+
+  detectProvider('marina')
+    .then((marina: MarinaProvider) => marina.getNetwork().then((network) => afterNetworkChange(marina, network)))
+    .catch(console.error);
 });
 
 function assetHashFromMarkets(markets: MarketInterface[]): string[] {

@@ -12,9 +12,9 @@
     Fiat,
     TradeButtonStatus,
     TradeStatus,
-    LIQUID_BTC,
-    LIQUID_USDT,
-    EXPLORER,
+    AssetHashes,
+    AssetNames,
+    NetworkNames,
   } from '../constants';
   import {
     calculateMarketPrice,
@@ -31,20 +31,38 @@
   import { utxoStore } from '../stores/utxostore';
   import { showToast } from '../utils/toast';
   import LoadingModal from '../components/LoadingModal.svelte';
+  import { getExplorerForNetwork } from '../utils/explorer';
 
   utxoStore.subscribe(() => null); // trigger utxo update
 
   let activeInputDirection: Direction = 'send';
-  let pair: CoinPair = {
-    send: coinStore.getCoin(LIQUID_BTC),
-    receive: coinStore.getCoin(LIQUID_USDT),
-  };
+
+  /**
+   * default trade pair is LBTC / USDT for a given network
+   * @param network network name to get asset hash for
+   * @returns CoinPair, the pair of coins
+   */
+  function defaultPair(network: string): CoinPair {
+    const lbtc = AssetHashes[AssetNames.LBTC];
+    const usdt = AssetHashes[AssetNames.USDT];
+    const lbtcHash = lbtc[network] || lbtc[NetworkNames.MAINNET];
+    const usdtHash = usdt[network] || usdt[NetworkNames.MAINNET];
+    return {
+      send: coinStore.getCoin(lbtcHash),
+      receive: coinStore.getCoin(usdtHash),
+    };
+  }
+
+  $: pair = defaultPair($marinaStore.network);
+
+  $: explorer = getExplorerForNetwork($marinaStore.network);
+
   $: orders = computeOrders(coinPairToPair(pair), $tdexStore.markets);
 
   let bestOrder: TradeOrder = undefined;
 
   allTradableAssets.subscribe((assets) => {
-    coinStore.updateWithAssets(assets);
+    coinStore.updateWithAssets(assets, explorer);
   });
 
   $: tradableCoins = $allTradableAssets.map((a) => coinStore.getCoin(a));
@@ -118,20 +136,18 @@
     const fromCoin = which === 'send' ? pair.send : pair.receive;
     const toCoin = which === 'send' ? pair.receive : pair.send;
 
-    if (!isValidAmount(amount)) return;
-
-    loading = true;
-
+    // reset other amount if this in null or undefined
     if (!amount) {
-      if (which === 'send') {
-        receiveAmount = undefined;
-      } else {
-        sendAmount = undefined;
-      }
-
-      loading = false;
+      if (which === 'send') receiveAmount = undefined;
+      else sendAmount = undefined;
       return; // skip if undefined
     }
+
+    // return if invalid amount or no orders available
+    if (!isValidAmount(amount)) return;
+    if (orders.length === 0) return;
+
+    loading = true;
 
     try {
       const amountInSatoshis = toSatoshi(amount, fromCoin.precision);
@@ -151,9 +167,11 @@
 
       const toSatoshis = fromSatoshi(toAmount, toCoin.precision);
 
-      coinsRatio = parseFloat(
-        (toSatoshis.toNumber() / amount).toFixed(fromCoin.precision)
-      );
+      coinsRatio =
+        $marinaStore.network === NetworkNames.MAINNET &&
+        parseFloat(
+          (toSatoshis.toNumber() / amount).toFixed(fromCoin.precision)
+        );
 
       if (which === 'send') {
         receiveAmount = toSatoshis.toString();
@@ -204,7 +222,7 @@
         },
         bestOrder,
         $utxoStore.unspents,
-        EXPLORER
+        explorer
       );
 
       tradeStatus = TradeStatus.COMPLETED;
@@ -247,7 +265,12 @@
       />
       <!-- svelte-ignore a11y-missing-attribute -->
       <a on:click={() => onFiatClick()}>
-        <FiatValue coin={pair.send} amount={sendAmount} fiat={fiatCoin} />
+        <FiatValue
+          coin={pair.send}
+          amount={sendAmount}
+          fiat={fiatCoin}
+          network={$marinaStore.network}
+        />
       </a>
     </div>
   </div>
@@ -279,7 +302,12 @@
       />
       <!-- svelte-ignore a11y-missing-attribute -->
       <a on:click={() => onFiatClick()}>
-        <FiatValue coin={pair.receive} amount={receiveAmount} fiat={fiatCoin} />
+        <FiatValue
+          coin={pair.receive}
+          amount={receiveAmount}
+          fiat={fiatCoin}
+          network={$marinaStore.network}
+        />
       </a>
     </div>
   </div>
@@ -290,6 +318,7 @@
     </div>
   </div>
 </form>
+<p class="is-size-7 has-text-right">{$marinaStore.network} network</p>
 <SelectCoinModal
   {tradableCoins}
   bind:active={showCoinModal}

@@ -32,6 +32,7 @@
   import { showToast } from '../utils/toast';
   import LoadingModal from '../components/LoadingModal.svelte';
   import { getExplorerForNetwork } from '../utils/explorer';
+  import { detectProvider, MarinaProvider } from 'marina-provider';
 
   utxoStore.subscribe(() => null); // trigger utxo update
 
@@ -92,6 +93,13 @@
     : !isValidAmount(sendAmount) || !isValidAmount(receiveAmount)
     ? TradeButtonStatus.EnterAmount
     : TradeButtonStatus.Trade;
+
+  // reset amounts and best order on connected, installed or network changes
+  marinaStore.subscribe(() => {
+    bestOrder = undefined;
+    receiveAmount = undefined;
+    sendAmount = undefined;
+  });
 
   const onCoinClick = (direction: Direction) => {
     activeInputDirection = direction;
@@ -318,7 +326,16 @@
     </div>
   </div>
 </form>
-<p class="is-size-7 has-text-right">{$marinaStore.network} network</p>
+{#if $marinaStore.network}
+  <p class="is-size-7">network: {$marinaStore.network}</p>
+{/if}
+{#if bestOrder?.traderClient?.providerUrl}
+  <p class="is-size-7 truncate">
+    provider: <a href={bestOrder.traderClient.providerUrl}>
+      {bestOrder.traderClient.providerUrl}
+    </a>
+  </p>
+{/if}
 <SelectCoinModal
   {tradableCoins}
   bind:active={showCoinModal}
@@ -341,5 +358,11 @@
   .coin-button {
     box-shadow: none !important;
     width: 140px;
+  }
+  .truncate {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>

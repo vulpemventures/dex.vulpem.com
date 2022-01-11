@@ -95,15 +95,11 @@
     : TradeButtonStatus.Trade;
 
   // reset amounts and best order on network change
-  detectProvider('marina')
-    .then((marina: MarinaProvider) => {
-      marina.on('NETWORK', () => {
-        bestOrder = undefined;
-        receiveAmount = undefined;
-        sendAmount = undefined;
-      });
-    })
-    .catch(console.error);
+  marinaStore.subscribe(() => {
+    bestOrder = undefined;
+    receiveAmount = undefined;
+    sendAmount = undefined;
+  });
 
   const onCoinClick = (direction: Direction) => {
     activeInputDirection = direction;

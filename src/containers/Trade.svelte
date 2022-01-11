@@ -94,7 +94,7 @@
     ? TradeButtonStatus.EnterAmount
     : TradeButtonStatus.Trade;
 
-  // reset amounts and best order on network change
+  // reset amounts and best order on connected, installed or network changes
   marinaStore.subscribe(() => {
     bestOrder = undefined;
     receiveAmount = undefined;

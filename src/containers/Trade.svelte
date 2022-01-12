@@ -32,7 +32,7 @@
   import { showToast } from '../utils/toast';
   import LoadingModal from '../components/LoadingModal.svelte';
   import { getExplorerForNetwork } from '../utils/explorer';
-  import { detectProvider, MarinaProvider } from 'marina-provider';
+  import { NetworkString } from 'ldk';
 
   utxoStore.subscribe(() => null); // trigger utxo update
 
@@ -200,7 +200,7 @@
 
   const onTradeSubmit = async () => {
     const identity = new BrowserInjectIdentity({
-      chain: 'liquid',
+      chain: $marinaStore.network as NetworkString,
       type: IdentityType.Inject,
       opts: {
         windowProvider: 'marina',

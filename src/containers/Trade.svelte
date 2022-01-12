@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { IdentityType, TradeOrder } from 'tdex-sdk';
+  import { IdentityType, TradeOrder, NetworkString } from 'tdex-sdk';
   import { coinStore } from '../stores/coinstore';
   import CoinRow from '../components/CoinRow.svelte';
   import ArrowDownIcon from '../components/icons/ArrowDownIcon.svelte';
@@ -32,7 +32,6 @@
   import { showToast } from '../utils/toast';
   import LoadingModal from '../components/LoadingModal.svelte';
   import { getExplorerForNetwork } from '../utils/explorer';
-  import type { NetworkString } from 'ldk';
 
   utxoStore.subscribe(() => null); // trigger utxo update
 

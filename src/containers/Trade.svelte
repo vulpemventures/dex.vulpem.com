@@ -32,7 +32,7 @@
   import { showToast } from '../utils/toast';
   import LoadingModal from '../components/LoadingModal.svelte';
   import { getExplorerForNetwork } from '../utils/explorer';
-  import { NetworkString } from 'ldk';
+  import type { NetworkString } from 'ldk';
 
   utxoStore.subscribe(() => null); // trigger utxo update
 

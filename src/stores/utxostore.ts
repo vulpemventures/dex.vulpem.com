@@ -10,10 +10,16 @@ const initialState: UtxoStore = {
   unspents: [],
 }
 
-const addUtxo = (utxo: Utxo): Updater<UtxoStore> => (s: UtxoStore) => ({
-  ...s,
-  unspents: [...s.unspents, utxo],
-})
+const addUtxo = (utxo: Utxo): Updater<UtxoStore> => (s: UtxoStore) => {
+  // don't repeat utxos
+  if (s.unspents.some((u) => u.txid === utxo.txid && u.vout === utxo.vout)) {
+    return s;
+  }
+  return {
+    ...s,
+    unspents: [...s.unspents, utxo],
+  }
+}
 
 const removeUtxo = (outpoint: Outpoint): Updater<UtxoStore> => (s: UtxoStore) => ({
   ...s,
